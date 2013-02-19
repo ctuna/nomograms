@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy package &apos;android.widget&apos; to &apos;FingerPaint/src&apos;&#x0A;- Original project: &apos;TipCalculator&apos;&#x0A;- Destination element: &apos;FingerPaint/src&apos;&#x0A;- Original element: &apos;TipCalculator/src/android.widget&apos;" description="Copy package" destination="=FingerPaint/src" element1="/src&lt;android.widget" flags="589830" fragments="1" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyPackages" stamp="1360828172889" version="1.0"/>
+</session>

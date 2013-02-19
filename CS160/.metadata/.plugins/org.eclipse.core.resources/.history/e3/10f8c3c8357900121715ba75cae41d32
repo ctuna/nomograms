@@ -1,0 +1,108 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/Wood"
+    android:orientation="vertical"
+    tools:context=".MainActivity" >
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/canvas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:padding="20dp"
+        tools:context=".MainActivity" >
+
+    </LinearLayout>
+
+   <LinearLayout
+       android:layout_width="fill_parent"
+       android:layout_height="wrap_content"
+       android:padding="20dp"
+       android:layout_gravity="center"
+       android:orientation="horizontal" >
+    
+    <FrameLayout
+        android:layout_width="0dp"
+    	android:layout_height="0dp"
+        android:id="@+id/pie" 
+        android:layout_weight="1.5"
+        >
+        
+        </FrameLayout>
+
+
+      	<LinearLayout
+       android:layout_width="40dp"
+       android:layout_height="fill_parent"
+       android:layout_gravity="bottom"
+       android:orientation="vertical" >
+
+ 	      <Button
+          android:layout_width="0dp"
+          android:layout_weight=".5"
+          android:layout_height="20dp"
+          android:background="@drawable/white_button"
+          android:id="@+id/whiteButton"/>   
+    
+	      <Button
+        android:layout_width="0dp"
+          android:layout_weight=".5"
+          android:layout_height="20dp"
+          android:background="@drawable/black_button"
+          android:id="@+id/blackButton"/>
+      </LinearLayout>       
+      
+
+
+
+
+    
+    
+
+        
+        
+        <LinearLayout
+            android:layout_width="150dp"
+            android:layout_height="fill_parent"
+            android:gravity="bottom"
+            android:orientation="vertical" >
+  		
+  		
+  		
+            <RelativeLayout
+                android:id="@+id/fingerprint_container"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="150dp"
+                 ></RelativeLayout>
+            
+     
+    <SeekBar
+        android:id="@+id/seekBar1"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+  	
+  		android:max="100" />
+            
+            
+
+        </LinearLayout>
+    
+
+        <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="fill_parent"
+        
+        />
+
+
+    </LinearLayout>
+
+</LinearLayout>
