@@ -1,7 +1,8 @@
 .axis line, .axis path {
   fill: none;
   stroke: black;
-  shape-rendering: crispEdges; }
+  shape-rendering: crispEdges;
+  width: 5px; }
 
 .axis text {
   font-family: sans-serif;
