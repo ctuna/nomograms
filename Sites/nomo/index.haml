@@ -3,9 +3,18 @@
 	%head
 		%meta(charset = "utf-8")
 		%title nomograms
+		%script(type="text/javascript" src="d3.v3.js")	
 		%link(rel="stylesheet" type = "text/css" href="style.css")
-		%script(type="text/javascript" src="d3.v3.js")
-		
-		%script{:type => 'text/javascript'}
 	%body
-		%div
+		%script{:type => 'text/javascript'}
+			var w = 500;
+			var h = 500;
+			
+			var yScale = d3.scale.linear().domain([0, w]).range([0, w]);
+
+			var yAxis = d3.svg.axis().orient("left").scale(yScale).ticks(5);
+			//Create SVG element
+			var svg = d3.select("body").append("svg").attr("width", w).attr("height", h);
+
+			
+			svg.append("g").attr("class", "axis").call(yAxis);
