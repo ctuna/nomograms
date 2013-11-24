@@ -17,7 +17,7 @@
       var yScale = d3.scale.linear().domain([0, w]).range([h-padding, padding]);
       var yAxis = d3.svg.axis().orient("left").scale(yScale).ticks(numTicks);
       <!-- /Create SVG element -->
-      var svg = d3.select("body").append("svg").attr("width", w).attr("height", h).on('mousedown.drag', null);
+      var svg = d3.select("body").append("svg").attr("width", w).attr("height", h).on('mousedown', null);
       svg.append("g").attr("class", "axis").attr("transform", "translate(" + padding + ",0)").call(yAxis);
 	var highlight = "#4CB4F5"
   	
