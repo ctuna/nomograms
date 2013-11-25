@@ -49,11 +49,43 @@ function init() {
 		
 	wrangle();
 	drawAxes();
+	drawLine();
+	drawDragPoints();
 	
 //disable highlighting
 
 }
 var xScale;
+var line;
+var circleRadius = 15;
+function drawLine(){
+	
+	line = svg.append("line")
+		.attr("id", "nomoline")
+		.attr("x1", xScale(d3.min(data[0].points, function(e) { return e.x; })).toFixed(2))
+		.attr("y1", yScale(d3.min(data[0].points, function(e) { return e.y; })).toFixed(2))
+		.attr("x2", xScale(d3.min(data[numAxes-1].points, function(e) { return e.x; })).toFixed(2))
+		.attr("y2", yScale(d3.min(data[numAxes-1].points, function(e) { return e.y; })).toFixed(2));
+}
+function drawDragPoints(){
+
+	
+	svg.selectAll("circle")
+	//
+		.data(data.filter(function(d, i) { return i != 1 ; }))
+		.enter()
+		.append("circle")
+		.attr("cx", function(d, i){
+			if (i == 0){ return line.attr("x1");}
+			else return line.attr("x2");
+			})
+		.attr("cy", function(d, i){
+			if (i == 0){ return line.attr("y1");}
+			else return line.attr("y2");
+			})
+		.attr("r", circleRadius);
+}
+
 function drawAxes(){
 	svg = d3.select("svg").remove();
 	//SVG container
@@ -61,7 +93,7 @@ function drawAxes(){
 	.attr("width", w)
 	.attr("height", h);
 	
-	
+	//CHANGE TO RESTFUL WAY
 	var lineData = [ { "x": 1.55,   "y": 5},  { "x": 20,  "y": 20},
 	{ "x": 40,  "y": 10}, { "x": 60,  "y": 40},
 	{ "x": 80,  "y": 5},  { "x": 100, "y": 60}];
@@ -100,7 +132,7 @@ function drawAxes(){
 			return d.name;
 		})
 		.attr("x", function(d){
-			return xScale(d3.min(d.points, function(e) { return e.x; })).toFixed(2);
+			return xScale(d3.mean(d.points, function(e) { return e.x; })).toFixed(2);
 			})
 	
 		
@@ -190,12 +222,10 @@ function updateSelector(){
 	d = this.value;
 	wrangle(d);
 	drawAxes();
+	drawLine();
+	drawDragPoints();
 }
-function makeAxis(index){
-	var currentScale = d3.scale.linear().domain(domain[index]).range([h-padding, padding]);
-	var currentAxis = d3.svg.axis().orient("left").scale(currentScale).ticks(numTicks[index]);
-	svg.append("g").attr("class", "axis").attr("transform", "translate(" + padding*(index+1) + ",0)").call(currentAxis);
-}
+
 function drawNomo(){
 	
 		document.getElementById('domain1').value = domain[0];
