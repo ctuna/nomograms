@@ -1,33 +1,66 @@
-var w = 200;
-var h = 200;
-var domain =[0, 400];
+var w = 500;
+var h = 500;
+var domain =[0, 5];
 var padding = 30;
 var numTicks = 10;
 var svg;
 var highlight;
 
+function generate(inputd1, inputd2, inputNumTicks){
+	domain = [inputd1, inputd2];
+	numTicks = inputNumTicks;
+	d3.select("svg").remove();
+	drawNomo(); 
+}
 
+
+function updateSelector(){
+	var val = this.value;
+	
+	if (val== 'nomo1'){
+		generate(0, 50, 25);
+	}
+	else if (val == "nomo2"){
+		generate(5, 10, 4);
+	}
+	else if (val == "nomo3"){
+		generate(0, 4, 10);
+	}
+}
+
+function drawNomo(){
+		var yScale = d3.scale.linear().domain(domain).range([h-padding, padding]);
+		var yAxis = d3.svg.axis().orient("left").scale(yScale).ticks(numTicks);
+		highlight =  "#4CB4F5";
+		svg = d3.select("body").append("svg").attr("width", w).attr("height", h).on('mousedown.drag', null);
+		svg.append("g").attr("class", "axis").attr("transform", "translate(" + padding + ",0)").call(yAxis);
+
+
+		line = svg.append("line")
+			.attr("id", "nomoline")
+			.attr("x1", padding)
+			.attr("y1", padding)
+			.attr("x2", w - padding)
+			.attr("y2", padding);
+		line.on("mousedown", mousedown);
+		svg.on("mouseup", mouseup);
+		numTicks = d3.selectAll(".tick line")[0].length; //actual number of ticks found by d3 
+	//TAKE AVERAGE OF AXIS REGIONS TO DETERMINE WHICH POINT TO MOVE.
+	//MAKE TICKS LIGHT UP
+}
 function init() {
 
+	d3.select("#selector")
+		.on("change", updateSelector)
+		.selectAll("option.auto")
+		.data(plist).enter()
+		.append("option")
+		.attr("value", function(d) { return d; })
+		.text(function(d) { return pname[d]; });
+	drawNomo();
+	
 //disable highlighting
-	var yScale = d3.scale.linear().domain(domain).range([h-padding, padding]);
-	var yAxis = d3.svg.axis().orient("left").scale(yScale).ticks(numTicks);
-	highlight =  "#4CB4F5";
-	svg = d3.select("body").append("svg").attr("width", w).attr("height", h).on('mousedown.drag', null);
-	svg.append("g").attr("class", "axis").attr("transform", "translate(" + padding + ",0)").call(yAxis);
 
-
-	line = svg.append("line")
-		.attr("id", "nomoline")
-		.attr("x1", padding)
-		.attr("y1", padding)
-		.attr("x2", w - padding)
-		.attr("y2", padding);
-	line.on("mousedown", mousedown);
-	svg.on("mouseup", mouseup);
-	numTicks = d3.selectAll(".tick line")[0].length; //actual number of ticks found by d3 
-//TAKE AVERAGE OF AXIS REGIONS TO DETERMINE WHICH POINT TO MOVE.
-//MAKE TICKS LIGHT UP
 }
 function mousedown() {
     var m = d3.mouse(this);
@@ -42,7 +75,7 @@ function mousemove() {
     var m = d3.mouse(this);
 	var g = d3.selectAll("g .tick")
 	d3.selectAll("g .tick").style("fill", "black");
-	console.log("closest tick index is: " + closestTick(this)[0]);
+
 	d3.select(g[0][closestTick(this)[0]]).style("fill", highlight);
 		if (m[1]>h- padding){
 			 line.attr("y1", h - padding);

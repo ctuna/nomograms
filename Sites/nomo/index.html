@@ -5,9 +5,28 @@
     <script src='d3.v3.js' type='text/javascript'></script>
     <script src='helper.js' type='text/javascript'></script>
     <link href='style.css' rel='stylesheet' type='text/css' />
+    <script type='text/javascript'>
+      var plist = [
+      	"nomo1", "nomo2", "nomo3"
+      	];
+      var pname = {
+      	"nomo1": "Nomogram 1 ",
+      	"nomo2": "Nomogram 2",
+      	"nomo3":  "Nomogram 3"
+      	}
+    </script>
   </meta>
   <body>
-    <input id='domain' />
+    <select id='selector'></select>
+    domain 1: (
+    <input id='domain1' />
+    ,
+    <input id='domain2' />
+    )
+    number of ticks
+    <input id='ticks1' />
+    <input id='buttonExecute' name='buttonExecute' onclick="generate(document.getElementById('domain1').value, document.getElementById('domain2').value, document.getElementById('ticks1').value)" type='button' value='nomo' />
+    <br />
     <script type='text/javascript'>
       init();
     </script>

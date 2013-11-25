@@ -5,8 +5,28 @@
 		%script(type="text/javascript" src="d3.v3.js") 
 		%script(type="text/javascript" src="helper.js")          
 		%link(rel="stylesheet" type = "text/css" href="style.css")
+		%script{:type => 'text/javascript'}
+			:plain
+				var plist = [
+					"nomo1", "nomo2", "nomo3"
+					];
+				var pname = {
+					"nomo1": "Nomogram 1 ",
+					"nomo2": "Nomogram 2",
+					"nomo3":  "Nomogram 3"
+					}
+		
 	%body
-		%input#domain
+		%select{:id=>"selector"}
+		domain 1: (
+		%input#domain1
+		, 
+		%input#domain2
+		)
+		number of ticks
+		%input#ticks1
+		%input#buttonExecute(name ="buttonExecute" onclick="generate(document.getElementById('domain1').value, document.getElementById('domain2').value, document.getElementById('ticks1').value)" type="button" value = "nomo") 
+		%br
 		%script{:type => 'text/javascript'}
 			:plain		
 				init();

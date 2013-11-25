@@ -3,7 +3,12 @@
 stroke :black;
   shape-rendering: crispEdges;
   width: 5px; }
-
+input{
+  width: 30px;
+}
+input#buttonExecute{
+  width: 60px;
+}
 line {
 stroke:black;
   stroke-width: 5px; }
