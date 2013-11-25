@@ -2,22 +2,11 @@
 %html
 	%meta(charset = "utf-8")
 		%title nomograms
-		%script(type="text/javascript" src="d3.v3.js")        
+		%script(type="text/javascript" src="d3.v3.js") 
+		%script(type="text/javascript" src="helper.js")          
 		%link(rel="stylesheet" type = "text/css" href="style.css")
 	%body
-		
+		%input#domain
 		%script{:type => 'text/javascript'}
-			
-			var w = 200;
-			var h = 200;
-			var padding = 30;
-                        
-			var yScale = d3.scale.linear().domain([0, w]).range([h-padding, padding]);
-
-			var yAxis = d3.svg.axis().orient("left").scale(yScale).ticks(10);
-			//Create SVG element
-			var svg = d3.select("body").append("svg").attr("width", w).attr("height", h);
-		
-			svg.append("g").attr("class", "axis").attr("transform", "translate(" + padding + ",0)").call(yAxis);
-			
-			svg.on("mousedown", mousedown).on("mouseup", mouseup);
+			:plain		
+				init();
