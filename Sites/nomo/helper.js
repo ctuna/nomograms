@@ -3,94 +3,38 @@ var h = 500;
 var domain =[[0, 5]];
 var numTicks=[10];
 var padding;
-
+var numAxes;
+var axisNames=[];
 var svg;
 var highlight;
 var linePos = [];
 var circleRadius = 15;
+var points=[];
 
-function generate(index, inputd1, inputd2, inputNumTicks){
-	domain[index] = [inputd1, inputd2];
-	numTicks[index] = inputNumTicks;
-	d3.select("svg").remove();
-	drawNomo(); 
-}
+var data;
 
-
-function updateSelector(){
-	var val = this.value;
-	
-	if (val== 'nomo1'){
-		generate(0, 0, 50, 25);
-		//generate(1, 0, 100, 25);
-	}
-	else if (val == "nomo2"){
-		generate(0, 5, 10, 4);
-	//	generate(1, 0, 10, 4);
-	}
-	else if (val == "nomo3"){
-		generate(0, 0, 4, 10);
-	//	generate(1, 0, 10, 4);
-	}
-}
-function makeAxis(index){
-	var currentScale = d3.scale.linear().domain(domain[index]).range([h-padding, padding]);
-	var currentAxis = d3.svg.axis().orient("left").scale(currentScale).ticks(numTicks[index]);
-	svg.append("g").attr("class", "axis").attr("transform", "translate(" + padding*(index+1) + ",0)").call(currentAxis);
-}
-
-function drawNomo(){
-	
-		document.getElementById('domain1').value = domain[0];
-		document.getElementById('domain2').value = domain[1];
-		document.getElementById('ticks1').value = numTicks;
-		
-		
-	
-		
-		
-		//var yScale = d3.scale.linear().domain(domain).range([h-padding, padding]);
-		//var yAxis1 = d3.svg.axis().orient("left").scale(yScale).ticks(numTicks);
-		//	2nd axis
-		//var yAxis2 = d3.svg.axis().orient("left").scale(yScale).ticks(numTicks);
-		
-		
-		highlight =  "#4CB4F5";
-		svg = d3.select("body").append("svg").attr("width", w).attr("height", h).on('mousedown.drag', null);
-		for (var i = 0; i < numTicks.length; i++ ){
-			makeAxis(i);
-			numTicks[i] = d3.selectAll(".tick line")[i].length;
+function wrangle(){
+	//the number of axes
+	//data = BMI;
+	//data = retainingWall;
+	data = secondOrder;
+	numAxes = data.length;
+	for (var i = 0; i <numAxes; i++){
+		axisNames[i]= data[i].name;
+		for (var p = 0; p < data[i].points.length; p++){
+			points[i]=data[i].points;
 		}
-		
-		//todo:unduplicate axis code 
-		//svg.append("g").attr("class", "axis").attr("transform", "translate(" + padding + ",0)").call(yAxis1);
-		//svg.append("g").attr("class", "axis").attr("transform", "translate(" + padding + ",0)").call(yAxis2);
-
-		line = svg.append("line")
-			.attr("id", "nomoline")
-			.attr("x1", padding)
-			.attr("y1", padding)
-			.attr("x2", w - padding)
-			.attr("y2", padding);
-		linePos[0]=padding;
-		linePos[1]=padding;
-		circle1 = svg.append("circle")
-	    .attr("cx", padding)
-		.attr("cy", padding)
-		.attr("r", circleRadius)
-		.attr("id", "circle1");
-		circle1.on("mousedown", mousedown);
-		line.on("mousedown", mousedown);
-		svg.on("mouseup", mouseup);
-		 //actual number of ticks found by d3 
-		d3.selectAll("g .tick text")
-			.attr("x", "-20")
-			.style("font-size", "15px");
-	//TAKE AVERAGE OF AXIS REGIONS TO DETERMINE WHICH POINT TO MOVE.
-	//MAKE TICKS LIGHT UP
-
+	}	
 }
+
+
 function init() {
+	//The SVG Container
+	svg = d3.select("body").append("svg")
+	.attr("width", w)
+	.attr("height", h);
+
+
 	padding= circleRadius*3;
 	d3.select("#selector")
 		.on("change", updateSelector)
@@ -99,10 +43,45 @@ function init() {
 		.append("option")
 		.attr("value", function(d) { return d; })
 		.text(function(d) { return pname[d]; });
-	drawNomo();
+	wrangle();
+	drawAxes();
 	
 //disable highlighting
 
+}
+var xScale;
+function drawAxes(){
+	//from sample code
+	
+	var lineData = [ { "x": 1.55,   "y": 5},  { "x": 20,  "y": 20},
+	{ "x": 40,  "y": 10}, { "x": 60,  "y": 40},
+	{ "x": 80,  "y": 5},  { "x": 100, "y": 60}];
+	//replace with num axes
+	
+	for (var i = 0; i < numAxes; i++){
+				
+		xScale = d3.scale.linear()
+			.domain([0, d3.max(data[numAxes-1].points, function(d) { return d.x; })])
+			.range([0+padding, w-padding]);
+		yScale = d3.scale.linear()
+			.domain([0, d3.max(data[numAxes-1].points, function(d) { return d.y; })])
+			.range([0+padding, h-padding]);
+				
+		var lineFunction = d3.svg.line()
+			.x(function(d) {return xScale(d.x.toFixed(2)) ; })
+			.y(function(d) {return yScale(d.y.toFixed(2)) ; })
+			.interpolate("linear");
+		console.log("in here");
+		//The line SVG Path we draw
+		var lineGraph = svg.append("path")
+			.attr("d", lineFunction(data[i].points))
+			//.attr("d", lineFunction(lineData))
+			.attr("stroke", "black")
+			.attr("stroke-width", 2)
+			.attr("fill", "none");
+			
+
+	}
 }
 function mousedown() {
     var m = d3.mouse(this);
@@ -170,4 +149,73 @@ function closestTick(event){
 			}
 	}
 	return [closestTickIndex, destinationY];    
+}
+
+
+
+function updateSelector(){
+	var val = this.value;
+
+}
+function makeAxis(index){
+	var currentScale = d3.scale.linear().domain(domain[index]).range([h-padding, padding]);
+	var currentAxis = d3.svg.axis().orient("left").scale(currentScale).ticks(numTicks[index]);
+	svg.append("g").attr("class", "axis").attr("transform", "translate(" + padding*(index+1) + ",0)").call(currentAxis);
+}
+function drawNomo(){
+	
+		document.getElementById('domain1').value = domain[0];
+		document.getElementById('domain2').value = domain[1];
+		document.getElementById('ticks1').value = numTicks;
+		
+		
+	
+		
+		
+		//var yScale = d3.scale.linear().domain(domain).range([h-padding, padding]);
+		//var yAxis1 = d3.svg.axis().orient("left").scale(yScale).ticks(numTicks);
+		//	2nd axis
+		//var yAxis2 = d3.svg.axis().orient("left").scale(yScale).ticks(numTicks);
+		
+		
+		highlight =  "#4CB4F5";
+		svg = d3.select("body").append("svg").attr("width", w).attr("height", h).on('mousedown.drag', null);
+		for (var i = 0; i < numTicks.length; i++ ){
+			makeAxis(i);
+			numTicks[i] = d3.selectAll(".tick line")[i].length;
+		}
+		
+		//todo:unduplicate axis code 
+		//svg.append("g").attr("class", "axis").attr("transform", "translate(" + padding + ",0)").call(yAxis1);
+		//svg.append("g").attr("class", "axis").attr("transform", "translate(" + padding + ",0)").call(yAxis2);
+
+		line = svg.append("line")
+			.attr("id", "nomoline")
+			.attr("x1", padding)
+			.attr("y1", padding)
+			.attr("x2", w - padding)
+			.attr("y2", padding);
+		linePos[0]=padding;
+		linePos[1]=padding;
+		circle1 = svg.append("circle")
+	    .attr("cx", padding)
+		.attr("cy", padding)
+		.attr("r", circleRadius)
+		.attr("id", "circle1");
+		circle1.on("mousedown", mousedown);
+		line.on("mousedown", mousedown);
+		svg.on("mouseup", mouseup);
+		 //actual number of ticks found by d3 
+		d3.selectAll("g .tick text")
+			.attr("x", "-20")
+			.style("font-size", "15px");
+	//TAKE AVERAGE OF AXIS REGIONS TO DETERMINE WHICH POINT TO MOVE.
+	//MAKE TICKS LIGHT UP
+
+}
+function generate(index, inputd1, inputd2, inputNumTicks){
+	domain[index] = [inputd1, inputd2];
+	numTicks[index] = inputNumTicks;
+	d3.select("svg").remove();
+	drawNomo(); 
 }
