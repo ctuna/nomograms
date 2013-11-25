@@ -75,7 +75,7 @@ function drawAxes(){
 			.range([0+padding, w-padding]);
 		yScale = d3.scale.linear()
 			.domain([0, maxY])
-			.range([0+padding, h-padding]);
+			.range([0+padding, h- padding]);
 	
 		var lineFunction = d3.svg.line()
 			.x(function(d) {return xScale(d.x.toFixed(2)) ; })
@@ -106,7 +106,7 @@ function drawAxes(){
 		
 			
 		.attr("y",function(d) {
-			return h - padding;  //line up all axes
+			return h - padding/2;  //line up all axes
 		})
 
 	
