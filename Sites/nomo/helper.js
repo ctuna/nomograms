@@ -13,11 +13,16 @@ var points=[];
 
 var data;
 
-function wrangle(){
-	//the number of axes
-	//data = BMI;
-	//data = retainingWall;
-	data = secondOrder;
+function wrangle(val){
+
+	if (val === 'retainingWall'){data=retainingWall;}
+	else if (val === 'secondOrder'){data=secondOrder;}
+	else if (val === 'BMI'){data=BMI;}
+	else {
+		console.log("we went in bad place");
+		data = retainingWall;
+	}
+
 	numAxes = data.length;
 	for (var i = 0; i <numAxes; i++){
 		axisNames[i]= data[i].name;
@@ -30,9 +35,7 @@ function wrangle(){
 
 function init() {
 	//The SVG Container
-	svg = d3.select("body").append("svg")
-	.attr("width", w)
-	.attr("height", h);
+
 
 
 	padding= circleRadius*3;
@@ -43,6 +46,7 @@ function init() {
 		.append("option")
 		.attr("value", function(d) { return d; })
 		.text(function(d) { return pname[d]; });
+		
 	wrangle();
 	drawAxes();
 	
@@ -51,7 +55,12 @@ function init() {
 }
 var xScale;
 function drawAxes(){
-	//from sample code
+	svg = d3.select("svg").remove();
+	//SVG container
+	svg = d3.select("body").append("svg")
+	.attr("width", w)
+	.attr("height", h);
+	
 	
 	var lineData = [ { "x": 1.55,   "y": 5},  { "x": 20,  "y": 20},
 	{ "x": 40,  "y": 10}, { "x": 60,  "y": 40},
@@ -59,17 +68,18 @@ function drawAxes(){
 	//replace with num axes
 	
 	for (var i = 0; i < numAxes; i++){
-				
+		var maxX= d3.max(data[numAxes-1].points, function(d) { return d.x; });
+		var maxY = d3.max(data[numAxes-1].points, function(d) { return d.y; });
 		xScale = d3.scale.linear()
-			.domain([0, d3.max(data[numAxes-1].points, function(d) { return d.x; })])
+			.domain([0, maxX])
 			.range([0+padding, w-padding]);
 		yScale = d3.scale.linear()
-			.domain([0, d3.max(data[numAxes-1].points, function(d) { return d.y; })])
+			.domain([0, maxY])
 			.range([0+padding, h-padding]);
-				
+	
 		var lineFunction = d3.svg.line()
 			.x(function(d) {return xScale(d.x.toFixed(2)) ; })
-			.y(function(d) {return yScale(d.y.toFixed(2)) ; })
+			.y(function(d) {return h - yScale(d.y.toFixed(2)) ; })
 			.interpolate("linear");
 		console.log("in here");
 		//The line SVG Path we draw
@@ -154,8 +164,9 @@ function closestTick(event){
 
 
 function updateSelector(){
-	var val = this.value;
-
+	d = this.value;
+	wrangle(d);
+	drawAxes();
 }
 function makeAxis(index){
 	var currentScale = d3.scale.linear().domain(domain[index]).range([h-padding, padding]);
