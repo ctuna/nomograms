@@ -1,13 +1,38 @@
-.axis line, .axis path {
-  fill: none;
-stroke :black;
-  shape-rendering: crispEdges;
-  width: 5px; }
+body{
+	padding:20px;
+	font-family:Helvetica, sans-serif;
+
+}
+.axis path  {
+  	fill: none;
+	stroke :black;
+  	shape-rendering: crispEdges;
+  	width: 20px; }
+
+.axis text {  
+    font-size: 50px;
+}
+.axis line{
+	fill: none;
+	stroke :black;
+	shape-rendering: crispEdges;
+	width: 20px; 
+	}
+line#nomoline{
+	 width: 50px;
+}
 input{
   width: 30px;
 }
 input#buttonExecute{
   width: 60px;
+}
+select#selector{
+	width: 200px;
+	line-height:700px;
+	font-size:80px;
+	margin-right:20px;
+
 }
 line {
 stroke:black;
