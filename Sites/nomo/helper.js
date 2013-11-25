@@ -66,7 +66,7 @@ function drawAxes(){
 	{ "x": 40,  "y": 10}, { "x": 60,  "y": 40},
 	{ "x": 80,  "y": 5},  { "x": 100, "y": 60}];
 	//replace with num axes
-	
+	//MAKE THE AXES
 	for (var i = 0; i < numAxes; i++){
 		var maxX= d3.max(data[numAxes-1].points, function(d) { return d.x; });
 		var maxY = d3.max(data[numAxes-1].points, function(d) { return d.y; });
@@ -89,10 +89,33 @@ function drawAxes(){
 			.attr("stroke", "black")
 			.attr("stroke-width", 2)
 			.attr("fill", "none");
-			
-
 	}
+	//LABEL THE AXES
+	
+	svg.selectAll("text")
+		.data(data)
+		.enter()
+		.append("text")
+		.text(function(d) {
+			return d.name;
+		})
+		.attr("x", function(d){
+			return xScale(d3.min(d.points, function(e) { return e.x; })).toFixed(2);
+			})
+	
+		
+			
+		.attr("y",function(d) {
+			return h - padding;  //line up all axes
+		})
+
+	
+	
 }
+
+
+
+
 function mousedown() {
     var m = d3.mouse(this);
     svg.on("mousemove", mousemove);
