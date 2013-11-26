@@ -8,26 +8,21 @@
     <link href='style.css' rel='stylesheet' type='text/css' />
     <script type='text/javascript'>
       var plist = [
-      	"BMI", "secondOrder", "retainingWall"
+      	"BMI", "secondOrder", "retainingWall", "dubois", "temp"
       	];
       var pname = {
       	"BMI": "BMI",
       	"secondOrder": "Second Order",
-      	"retainingWall":  "Retaining Wall"
-      	}
+      	"retainingWall":  "Retaining Wall",
+      	"dubois":  "Dubois"
+      	,
+      	"temp":  "Temperature"
+      	};
     </script>
   </meta>
   <body>
     <select id='selector'></select>
     <br />
-    domain 1: (
-    <input id='domain1' />
-    ,
-    <input id='domain2' />
-    )
-    number of ticks
-    <input id='ticks1' />
-    <input id='buttonExecute' name='buttonExecute' onclick="generate(document.getElementById('domain1').value, document.getElementById('domain2').value, document.getElementById('ticks1').value)" type='button' value='nomo' />
     <br />
     <script type='text/javascript'>
       init();

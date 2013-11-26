@@ -14,13 +14,20 @@ var points=[];
 var data;
 
 function wrangle(val){
-
+	data = [];
 	if (val === 'retainingWall'){data=retainingWall;}
-	else if (val === 'secondOrder'){data=secondOrder;}
+	else if (val === 'secondOrder'){
+		//these come in in wrong order
+		data[0]=secondOrder[0];
+		data[1]=secondOrder[2];
+		data[2]=secondOrder[1];
+		}
 	else if (val === 'BMI'){data=BMI;}
+	else if (val == 'dubois'){data = dubois;}
+	else if (val == 'temp'){data = temp;}
 	else {
 		console.log("we went in bad place");
-		data = retainingWall;
+		data = BMI;
 	}
 
 	numAxes = data.length;
@@ -49,23 +56,54 @@ function init() {
 		
 	wrangle();
 	drawAxes();
-	drawLine();
-	drawDragPoints();
+	if (numAxes > 2){
+		drawLine();
+		drawDragPoints();
+	}
+
 	
 //disable highlighting
 
 }
+
+
 var xScale;
 var line;
 var circleRadius = 15;
 function drawLine(){
+	if (numAxes < 3){
+		return;
+	}
+	
+
 	
 	line = svg.append("line")
 		.attr("id", "nomoline")
-		.attr("x1", xScale(d3.min(data[0].points, function(e) { return e.x; })).toFixed(2))
-		.attr("y1", yScale(d3.min(data[0].points, function(e) { return e.y; })).toFixed(2))
-		.attr("x2", xScale(d3.min(data[numAxes-1].points, function(e) { return e.x; })).toFixed(2))
-		.attr("y2", yScale(d3.min(data[numAxes-1].points, function(e) { return e.y; })).toFixed(2));
+		.attr("x1", xScale ( 
+			data[0].points.filter(function(d, i){
+				return d3.min(data[0].points, 
+						function(e) { return e.y; }) //a number
+							== d.y;
+							})[0].x.toFixed(2)
+						)
+					)
+			
+			
+			
+			
+			
+		.attr("y1", yScale(d3.min(data[0].points, function(e) { return e.y; })).toFixed(2))//want highest
+		//how to get x of highest y? 
+		
+		.attr("x2", xScale ( 
+			data[2].points.filter(function(d, i){
+				return d3.min(data[2].points, 
+						function(e) { return e.y; }) //a number
+							== d.y;
+							})[0].x.toFixed(2)
+						)
+					)
+		.attr("y2", yScale(d3.min(data[2].points, function(e) { return e.y; })).toFixed(2));//want min Y, highest*/ 
 }
 function drawDragPoints(){
 
@@ -83,9 +121,33 @@ function drawDragPoints(){
 			if (i == 0){ return line.attr("y1");}
 			else return line.attr("y2");
 			})
-		.attr("r", circleRadius);
+		.attr("r", circleRadius)
+		.attr("class", "dragpoint")
+		.on("mousedown", function(d, i){clickCircle(i, this)})
+		.on("mouseup", mouseup);
+	svg.on("mouseup", mouseup);
+		
+		
 }
 
+var currentCircle;
+function clickCircle(i, clickevent){
+	currentCircle = i;
+	
+	svg.on("mousemove", mousemove);
+}
+function moveCircle(i){
+	console.log(d3.mouse(this));/**
+	if (i == 0){
+		line.attr("x1", m[0]);
+		line.attr("y1", m[1]);
+	}
+	else if (i == 1){
+		line.attr("x2", m[0]);
+		line.attr("y2", m[1]);
+		
+	}*/
+}
 function drawAxes(){
 	svg = d3.select("svg").remove();
 	//SVG container
@@ -150,7 +212,8 @@ function drawAxes(){
 
 function mousedown() {
     var m = d3.mouse(this);
-    svg.on("mousemove", mousemove);
+	console.log("moused down: ");
+    //svg.on("mousemove", mousemove);
 }
 
 function getY(s){
@@ -158,37 +221,49 @@ function getY(s){
 }
 
 function mousemove() {
+	var m = d3.mouse(this);
 	
-    var m = d3.mouse(this);
-	var g = d3.selectAll("g .tick")
-	d3.selectAll("g .tick").style("fill", "black");
-
-	d3.select(g[0][closestTick(this)[0]]).style("fill", highlight);
-		if (m[1]>h- padding){
-			 line.attr("y1", h - padding);
-		}
-		else if (m[1]<padding){
-			line.attr("y1", padding);
-		}
-        else {
-			line.attr("y1", m[1]);
-		}
-		linePos[0]=padding;
-		linePos[1]=m[1];
-		circle1
-		.attr("cx", linePos[0])
-		.attr("cy", linePos[1]);
+	
+	d3.selectAll("circle")
+		.filter(function (d, i){ return i ==currentCircle;})
+		.attr("cx", m[0]);
+	d3.selectAll("circle")
+		.filter(function (d, i){ return i ==currentCircle;})
+		.attr("cy", m[1]);
+    var closestPointReturn;
+	if (currentCircle == 0){
+		//find closest point
+		closestPointReturn = closestPoint(m)
+		line.attr("x1", closestPointReturn[0]);
+		line.attr("y1", closestPointReturn[1]);
+		d3.selectAll("circle")
+			.filter(function (d, i){ return i ==currentCircle;})
+			.attr("cx", closestPointReturn[0])
+			.attr("cy", closestPointReturn[1]);
+			
+		
+	}
+	else if (currentCircle == 1){
+		closestPointReturn= closestPoint(m)
+		line.attr("x2", closestPointReturn[0]);
+		line.attr("y2", closestPointReturn[1]);
+		d3.selectAll("circle")
+			.filter(function (d, i){ return i ==currentCircle;})
+			.attr("cx", closestPointReturn[0])
+			.attr("cy", closestPointReturn[1]);
+	}
 }
 
 
 function mouseup() {
-	var closest = closestTick(this);
-	line.attr("y1", closest[1]); 	//change position to closest position
-	circle1.attr("cy", closest[1]);
-    svg.on("mousemove", null);
-	var g = d3.selectAll("g .tick")
-	d3.selectAll("g .tick").style("fill", "black");
-	d3.select(g[0][closestTick(this)[0]]).style("fill", highlight);
+	 svg.on("mousemove", null);
+//	var closest = closestTick(this);
+	//line.attr("y1", closest[1]); 	//change position to closest position
+//	circle1.attr("cy", closest[1]);
+   
+//	var g = d3.selectAll("g .tick")
+///	d3.selectAll("g .tick").style("fill", "black");
+//	d3.select(g[0][closestTick(this)[0]]).style("fill", highlight);
 }
 
 
@@ -216,6 +291,32 @@ function closestTick(event){
 	return [closestTickIndex, destinationY];    
 }
 
+function closestPoint(m){
+	console.log("current circle is: " + currentCircle);
+	var dataIndex = 0;
+	if (currentCircle == 1){
+		dataIndex=2;
+	}
+	var currentDistance, minDistance, xScaled, yScaled;
+	minDistance = 100000;
+	//iterate to find closest point in new scheme
+	for (var i=0;i<data[dataIndex].points.length;i++){
+		xScaled = xScale(data[dataIndex].points[i].x.toFixed(2));
+		yScaled = yScale(data[dataIndex].points[i].y.toFixed(2));
+		currentDistance = euclid ([m[0], m[1]], [xScaled, yScaled]);
+		
+		//find closest tick to current y position
+		if (currentDistance < minDistance){
+			minDistance = currentDistance;
+			destinationX = xScaled;
+			destinationY = yScaled;
+			
+			}
+	}
+	return [destinationX, destinationY];    
+}
+
+
 
 
 function updateSelector(){
@@ -233,53 +334,29 @@ function drawNomo(){
 		document.getElementById('ticks1').value = numTicks;
 		
 		
-	
-		
-		
-		//var yScale = d3.scale.linear().domain(domain).range([h-padding, padding]);
-		//var yAxis1 = d3.svg.axis().orient("left").scale(yScale).ticks(numTicks);
-		//	2nd axis
-		//var yAxis2 = d3.svg.axis().orient("left").scale(yScale).ticks(numTicks);
-		
-		
 		highlight =  "#4CB4F5";
-		svg = d3.select("body").append("svg").attr("width", w).attr("height", h).on('mousedown.drag', null);
-		for (var i = 0; i < numTicks.length; i++ ){
-			makeAxis(i);
-			numTicks[i] = d3.selectAll(".tick line")[i].length;
-		}
-		
-		//todo:unduplicate axis code 
-		//svg.append("g").attr("class", "axis").attr("transform", "translate(" + padding + ",0)").call(yAxis1);
-		//svg.append("g").attr("class", "axis").attr("transform", "translate(" + padding + ",0)").call(yAxis2);
 
-		line = svg.append("line")
-			.attr("id", "nomoline")
-			.attr("x1", padding)
-			.attr("y1", padding)
-			.attr("x2", w - padding)
-			.attr("y2", padding);
-		linePos[0]=padding;
-		linePos[1]=padding;
-		circle1 = svg.append("circle")
-	    .attr("cx", padding)
-		.attr("cy", padding)
-		.attr("r", circleRadius)
-		.attr("id", "circle1");
-		circle1.on("mousedown", mousedown);
-		line.on("mousedown", mousedown);
-		svg.on("mouseup", mouseup);
-		 //actual number of ticks found by d3 
-		d3.selectAll("g .tick text")
-			.attr("x", "-20")
-			.style("font-size", "15px");
-	//TAKE AVERAGE OF AXIS REGIONS TO DETERMINE WHICH POINT TO MOVE.
-	//MAKE TICKS LIGHT UP
 
 }
-function generate(index, inputd1, inputd2, inputNumTicks){
-	domain[index] = [inputd1, inputd2];
-	numTicks[index] = inputNumTicks;
-	d3.select("svg").remove();
-	drawNomo(); 
+
+function euclid(a, b) {
+
+  // return Math.sqrt(
+  //   Math.pow(a[0]-b[0], 2) +
+  //   Math.pow(a[1]-b[1], 2) +
+  //   Math.pow(a[2]-b[2], 2)
+  // )
+
+  // return Math.sqrt(
+  //   [0,1,2].reduce(function(prev, current, i) {
+  //     return prev + Math.pow(a[i]-b[i], 2);
+  //   }, 0)
+  // );
+
+  var sum = 0;
+  var n;
+  for (n=0; n < a.length; n++) {
+    sum += Math.pow(a[n]-b[n], 2);
+  }
+  return Math.sqrt(sum);
 }

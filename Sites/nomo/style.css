@@ -12,6 +12,9 @@ body{
 .axis text {  
     font-size: 50px;
 }
+dragpoint{
+	color: blue;
+}
 .axis line{
 	fill: none;
 	stroke :black;
