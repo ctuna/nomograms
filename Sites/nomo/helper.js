@@ -206,8 +206,26 @@ function drawAxes(){
 	
 	
 }
-
-
+var tickWidth = 5; 
+var granularity = 1;
+function drawTicks(){
+	//DRAW BIG TICKS ON EACH AXIS 
+	for (var i = 0; i < 1; i ++ ){
+		for (var j = 0; j < granularity; j++){
+		svg.selectAll("line")
+			.data(data[i].ticks[j])
+			.enter()
+			.append("line")
+			.attr("x1", function (d)
+				{return xScale
+						(d.x.toFixed(2)) - tickWidth})
+			.attr("y1", function(d){return h - yScale(d.y.toFixed(2))})
+			.attr("x2", function(d)	{return xScale
+						(d.x.toFixed(2)) + tickWidth})
+			.attr("y2", function(d){return h - yScale(d.y.toFixed(2))})
+			}
+	}
+}
 
 
 function mousedown() {
@@ -292,7 +310,6 @@ function closestTick(event){
 }
 
 function closestPoint(m){
-	console.log("current circle is: " + currentCircle);
 	var dataIndex = 0;
 	if (currentCircle == 1){
 		dataIndex=2;
