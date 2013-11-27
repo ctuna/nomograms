@@ -162,8 +162,20 @@ function drawAxes(){
 	//replace with num axes
 	//MAKE THE AXES
 	for (var i = 0; i < numAxes; i++){
-		var maxX= d3.max(data[numAxes-1].points, function(d) { return d.x; });
-		var maxY = d3.max(data[numAxes-1].points, function(d) { return d.y; });
+		//LARGEST X WILL BE ON RIGHT-MOST AXIS
+		var maxX= 0;
+		var maxY =0;
+		for (var k = 0; k < numAxes; k++){
+			currentMaxY = d3.max(data[k].points, function(d) { return d.y; });
+			currentMaxX = d3.max(data[k].points, function(d) { return d.x; });
+			if (currentMaxY > maxY){
+				maxY = currentMaxY;
+			}
+			if (currentMaxX > maxX){
+				maxX = currentMaxX;
+			}
+		}
+		
 		xScale = d3.scale.linear()
 			.domain([0, maxX])
 			.range([0+padding, w-padding]);
@@ -206,26 +218,35 @@ function drawAxes(){
 	
 	
 }
-var tickWidth = 5; 
-var granularity = 1;
-function drawTicks(){
-	//DRAW BIG TICKS ON EACH AXIS 
-	for (var i = 0; i < 1; i ++ ){
-		for (var j = 0; j < granularity; j++){
+var tickWidth = 1; 
+var granularity = 2;
+function drawTicks(level, axis, wid){
+
 		svg.selectAll("line")
-			.data(data[i].ticks[j])
+			.data(data[axis].ticks[level])
 			.enter()
 			.append("line")
+			.attr("stroke", "pink")
+			.attr("stroke-width", 2)
+			.attr("fill", "none")
 			.attr("x1", function (d)
 				{return xScale
-						(d.x.toFixed(2)) - tickWidth})
-			.attr("y1", function(d){return h - yScale(d.y.toFixed(2))})
-			.attr("x2", function(d)	{return xScale
-						(d.x.toFixed(2)) + tickWidth})
-			.attr("y2", function(d){return h - yScale(d.y.toFixed(2))})
-			}
-	}
+						(d.x) })
+			.attr("y1", function(d){return h - yScale(d.y)})
+			.attr("x2", function(d)	{
+			
+
+				return xScale((d.x + (wid*d.dx)))
+					})
+			.attr("y2", function(d){
+		
+				return h - yScale((d.y + (wid*d.dy)))
+								
+							})
+			
+		
 }
+
 
 
 function mousedown() {

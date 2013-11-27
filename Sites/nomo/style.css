@@ -37,9 +37,7 @@ select#selector{
 	margin-right:20px;
 
 }
-line {
-stroke:black;
-  stroke-width: 5px; }
+
 
 .axis text {
   font-family: sans-serif;
