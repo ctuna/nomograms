@@ -94,7 +94,7 @@ function drawLine(){
 			
 			
 		.attr("y1", yScale(d3.min(data[0].points, function(e) { return e.y; })).toFixed(2))//want highest
-		//how to get x of highest y? 
+
 		
 		.attr("x2", xScale ( 
 			data[2].points.filter(function(d, i){
@@ -150,10 +150,11 @@ function moveCircle(i){
 	}*/
 }
 
-
-function drawTicks(level, axis, wid){
-
-	var myClass = "axis"+axis+"-level"+level;
+var tickLength= 2 
+function drawTicks(level){
+	var myClass;
+	for (var axis = 0; axis < numAxes; axis ++){
+		myClass = "axis"+axis+"-level"+level;
 		svg.selectAll("."+"myClass")
 			.data(data[axis].ticks[level])
 			.enter()
@@ -169,15 +170,15 @@ function drawTicks(level, axis, wid){
 			.attr("x2", function(d)	{
 			
 
-				return xScale((d.x + (wid*d.dy)))
+				return xScale((d.x + (tickLength*d.dy)))
 					})
 			.attr("y2", function(d){
 		
-				return h - yScale((d.y - (wid*d.dx)))
+				return h - yScale((d.y - (tickLength*d.dx)))
 								
 							})
 			
-			
+			}
 		
 }
 
@@ -208,7 +209,7 @@ function drawAxes(){
 				maxX = currentMaxX;
 			}
 		}
-		
+		var maxTotal = d3.max(maxX, maxY);
 		xScale = d3.scale.linear()
 			.domain([0, maxX])
 			.range([0+padding, w-padding]);
