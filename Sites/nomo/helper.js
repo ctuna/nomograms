@@ -167,11 +167,11 @@ function drawTicks(level, axis, wid){
 			.attr("x2", function(d)	{
 			
 
-				return xScale((d.x + (wid*d.dx)))
+				return xScale((d.x + (wid*d.dy)))
 					})
 			.attr("y2", function(d){
 		
-				return h - yScale((d.y + (wid*d.dy)))
+				return h - yScale((d.y - (wid*d.dx)))
 								
 							})
 			
