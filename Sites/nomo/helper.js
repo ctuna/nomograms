@@ -79,6 +79,7 @@ function drawLine(){
 	
 	line = svg.append("line")
 		.attr("id", "nomoline")
+		.attr("stroke-width", 5)
 		.attr("x1", xScale ( 
 			data[0].points.filter(function(d, i){
 				return d3.min(data[0].points, 
@@ -148,6 +149,36 @@ function moveCircle(i){
 		
 	}*/
 }
+
+
+function drawTicks(level, axis, wid){
+
+		svg.selectAll("line")
+			.data(data[axis].ticks[level])
+			.enter()
+			.append("line")
+			.attr("stroke", "pink")
+			.attr("stroke-width", 2)
+			.attr("fill", "none")
+			.attr("x1", function (d)
+				{return xScale
+						(d.x) })
+			.attr("y1", function(d){return h - yScale(d.y)})
+			.attr("x2", function(d)	{
+			
+
+				return xScale((d.x + (wid*d.dx)))
+					})
+			.attr("y2", function(d){
+		
+				return h - yScale((d.y + (wid*d.dy)))
+								
+							})
+			
+			
+		
+}
+
 function drawAxes(){
 	svg = d3.select("svg").remove();
 	//SVG container
@@ -220,32 +251,6 @@ function drawAxes(){
 }
 var tickWidth = 1; 
 var granularity = 2;
-function drawTicks(level, axis, wid){
-
-		svg.selectAll("line")
-			.data(data[axis].ticks[level])
-			.enter()
-			.append("line")
-			.attr("stroke", "pink")
-			.attr("stroke-width", 2)
-			.attr("fill", "none")
-			.attr("x1", function (d)
-				{return xScale
-						(d.x) })
-			.attr("y1", function(d){return h - yScale(d.y)})
-			.attr("x2", function(d)	{
-			
-
-				return xScale((d.x + (wid*d.dx)))
-					})
-			.attr("y2", function(d){
-		
-				return h - yScale((d.y + (wid*d.dy)))
-								
-							})
-			
-		
-}
 
 
 

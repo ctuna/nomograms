@@ -21,8 +21,9 @@ dragpoint{
 	shape-rendering: crispEdges;
 	width: 20px; 
 	}
-line#nomoline{
-	 width: 50px;
+#nomoline{
+	 width: 5px;
+	stroke:black;
 }
 input{
   width: 30px;
