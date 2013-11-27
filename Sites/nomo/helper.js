@@ -209,7 +209,7 @@ function drawAxes(){
 				maxX = currentMaxX;
 			}
 		}
-		var maxTotal = d3.max(maxX, maxY);
+	
 		xScale = d3.scale.linear()
 			.domain([0, maxX])
 			.range([0+padding, w-padding]);
