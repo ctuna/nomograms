@@ -153,13 +153,15 @@ function moveCircle(i){
 
 function drawTicks(level, axis, wid){
 
-		svg.selectAll("line")
+	var myClass = "axis"+axis+"-level"+level;
+		svg.selectAll("."+"myClass")
 			.data(data[axis].ticks[level])
 			.enter()
 			.append("line")
 			.attr("stroke", "pink")
 			.attr("stroke-width", 2)
 			.attr("fill", "none")
+			.attr("class", myClass)
 			.attr("x1", function (d)
 				{return xScale
 						(d.x) })
