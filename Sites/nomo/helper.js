@@ -66,7 +66,30 @@ function init() {
 //disable highlighting
 
 }
+var closestCurrentPoints=[5, 5, 5];
 
+function drawInputs(){
+	closestCurrentPoints[1]=5;
+	var myClass = "axisControl";
+	svg.selectAll("."+myClass).remove();
+	svg.selectAll("."+myClass)
+		.data(data)
+		.enter()
+		.append("text")
+		.attr("class", myClass)
+		.attr("x", function(d, i){
+		return xScale(d3.mean(d.points, function(e) { return e.x; })).toFixed(2);} )
+		.attr("y", padding/2)
+		.text(function(d, i){return closestCurrentPoints[i].toFixed(2)})
+}
+
+/**
+		
+	})	
+	.attr("y",function(d) {
+		return h - padding/2;  //line up all axes
+})
+*/
 
 var xScale;
 var line;
@@ -286,6 +309,7 @@ function getY(s){
 }
 
 function mousemove() {
+
 	var m = d3.mouse(this);
 	
 	
@@ -320,6 +344,7 @@ function mousemove() {
 			.attr("cy", closestPointReturn[1]);
 	}
 	console.log("closest value is " + closestPointReturn[2].toFixed(2));
+	drawInputs();
 }
 
 
@@ -364,6 +389,10 @@ function closestPoint(m){
 	if (currentCircle == 1){
 		dataIndex=2;
 	}
+	else if (currentCircle == 2){
+		dataIndex = 1;
+	}
+	
 	var currentDistance, minDistance, xScaled, yScaled, currentPointValue, closestPointValue;
 	minDistance = 100000;
 	//iterate to find closest point in new scheme
@@ -381,7 +410,7 @@ function closestPoint(m){
 			
 			}
 	}
-	
+	closestCurrentPoints[dataIndex]=closestPointValue;
 	return [destinationX, destinationY, closestPointValue];    
 }
 
