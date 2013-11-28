@@ -44,7 +44,7 @@ function init() {
 	//The SVG Container
 
 
-
+	tickColors = ["#444445", "#747475", "#adadae", "#e4e4e4", "#e4e4e4"];
 	padding= circleRadius*3;
 	d3.select("#selector")
 		.on("change", updateSelector)
@@ -56,6 +56,7 @@ function init() {
 		
 	wrangle();
 	drawAxes();
+	drawTicks(1);
 	if (numAxes > 2){
 		drawLine();
 		drawDragPoints();
@@ -151,7 +152,9 @@ function moveCircle(i){
 }
 
 var tickLength= 2 
+var tickColors =[];
 function drawTicks(level){
+
 	var myClass;
 	for (var axis = 0; axis < numAxes; axis ++){
 		myClass = "axis"+axis+"-level"+level;
@@ -159,98 +162,113 @@ function drawTicks(level){
 			.data(data[axis].ticks[level])
 			.enter()
 			.append("line")
-			.attr("stroke", "pink")
+			.attr("stroke", tickColors[level])
 			.attr("stroke-width", 2)
 			.attr("fill", "none")
 			.attr("class", myClass)
 			.attr("x1", function (d)
-				{return xScale
-						(d.x) })
+				{return xScale	(d.x) })
 			.attr("y1", function(d){return h - yScale(d.y)})
-			.attr("x2", function(d)	{
-			
-
-				return xScale((d.x + (tickLength*d.dy)))
-					})
-			.attr("y2", function(d){
-		
-				return h - yScale((d.y - (tickLength*d.dx)))
-								
-							})
-			
+			.attr("x2", function(d)	{return xScale((d.x + (tickLength*d.dy)))})
+			.attr("y2", function(d){return h - yScale((d.y - (tickLength*d.dx)))})
 			}
+			
+			for (var axis = 0; axis < numAxes; axis ++){
+				myClass = "label-"+"axis"+axis+"-level"+level;
+				svg.selectAll("."+"myClass")
+					.data(data[axis].ticks[level])
+					.enter()
+					.append("text")
+					//.attr("stroke", tickColors[level])
+					//.attr("stroke-width", 2)
+					//.attr("fill", "none")
+					.attr("class", myClass)
+					.attr("x", function (d)
+						{return xScale	(d.x) })
+					.attr("y", function(d){return h - yScale(d.y)})
+					.text(function(d) { 
+						if (d.u.toFixed(0) == d.u.toFixed(2)){return d.u.toFixed(0);}
+						else return d.u.toFixed(2) })
+					//.attr("x2", function(d)	{return xScale((d.x + (tickLength*d.dy)))})
+					//.attr("y2", function(d){return h - yScale((d.y - (tickLength*d.dx)))})
+					}
+			
+			
+			
 		
 }
 
 function drawAxes(){
 	svg = d3.select("svg").remove();
 	//SVG container
-	svg = d3.select("body").append("svg")
-	.attr("width", w)
-	.attr("height", h);
-	
+
 	//CHANGE TO RESTFUL WAY
-	var lineData = [ { "x": 1.55,   "y": 5},  { "x": 20,  "y": 20},
-	{ "x": 40,  "y": 10}, { "x": 60,  "y": 40},
-	{ "x": 80,  "y": 5},  { "x": 100, "y": 60}];
+
 	//replace with num axes
 	//MAKE THE AXES
-	for (var i = 0; i < numAxes; i++){
-		//LARGEST X WILL BE ON RIGHT-MOST AXIS
-		var maxX= 0;
-		var maxY =0;
-		for (var k = 0; k < numAxes; k++){
+	var maxX=0;
+	var maxY=0;
+	var currentMaxX=0;
+	var currentMaxY=0;
+	var minX = 1000;
+	var minY = 1000;
+	var currentMinX = 1000;
+	var currentMinY = 1000;
+	for (var k = 0; k < numAxes; k++){
 			currentMaxY = d3.max(data[k].points, function(d) { return d.y; });
 			currentMaxX = d3.max(data[k].points, function(d) { return d.x; });
-			if (currentMaxY > maxY){
-				maxY = currentMaxY;
-			}
-			if (currentMaxX > maxX){
-				maxX = currentMaxX;
-			}
+			currentMinY = d3.min(data[k].points, function(d) { return d.y; });
+			currentMinX = d3.min(data[k].points, function(d) { return d.x; });
+			if (currentMaxY > maxY){maxY = currentMaxY;}
+			if (currentMaxX > maxX){maxX = currentMaxX;	}
+			if (currentMinY < minY){minY = currentMinY;}
+			if (currentMinX < minX){minX = currentMinX;	}
 		}
 	
-		xScale = d3.scale.linear()
-			.domain([0, maxX])
-			.range([0+padding, w-padding]);
-		yScale = d3.scale.linear()
-			.domain([0, maxY])
-			.range([0+padding, h- padding]);
-	
-		var lineFunction = d3.svg.line()
+	var xRatio = (maxX - minX)/(w- 2*padding);
+	h= (maxY-minY)/xRatio + 2*padding;
+	xScale = d3.scale.linear()
+		.domain([0, maxX])
+		.range([0+padding, w-padding]);
+	yScale = d3.scale.linear()
+		.domain([0, maxY])
+		.range([0+padding, h - padding]);
+	console.log("h is initialized to: " + h);
+	//now that we know width, make SVG
+	svg = d3.select("body").append("svg")
+		.attr("width", w)
+		.attr("height", h);
+	var lineFunction = d3.svg.line()
 			.x(function(d) {return xScale(d.x.toFixed(2)) ; })
 			.y(function(d) {return h - yScale(d.y.toFixed(2)) ; })
 			.interpolate("linear");
 		console.log("in here");
 		//The line SVG Path we draw
+	for (var i = 0; i < numAxes; i++){
+		//DRAW AXES
 		var lineGraph = svg.append("path")
 			.attr("d", lineFunction(data[i].points))
-			//.attr("d", lineFunction(lineData))
 			.attr("stroke", "black")
 			.attr("stroke-width", 2)
 			.attr("fill", "none");
-	}
-	//LABEL THE AXES
-	
-	svg.selectAll("text")
-		.data(data)
-		.enter()
-		.append("text")
-		.text(function(d) {
-			return d.name;
-		})
-		.attr("x", function(d){
-			return xScale(d3.mean(d.points, function(e) { return e.x; })).toFixed(2);
+		//LABEL THE AXES
+		svg.selectAll("text")
+			.data(data)
+			.enter()
+			.append("text")
+			.text(function(d) {
+				return d.name;
 			})
-	
-		
-			
-		.attr("y",function(d) {
-			return h - padding/2;  //line up all axes
+			.attr("x", function(d){
+				return xScale(d3.mean(d.points, function(e) { return e.x; })).toFixed(2);
+			})	
+			.attr("y",function(d) {
+				return h - padding/2;  //line up all axes
 		})
 
 	
 	
+}
 }
 var tickWidth = 1; 
 var granularity = 2;
@@ -281,8 +299,10 @@ function mousemove() {
 	if (currentCircle == 0){
 		//find closest point
 		closestPointReturn = closestPoint(m)
+
 		line.attr("x1", closestPointReturn[0]);
 		line.attr("y1", closestPointReturn[1]);
+		
 		d3.selectAll("circle")
 			.filter(function (d, i){ return i ==currentCircle;})
 			.attr("cx", closestPointReturn[0])
@@ -299,6 +319,7 @@ function mousemove() {
 			.attr("cx", closestPointReturn[0])
 			.attr("cy", closestPointReturn[1]);
 	}
+	console.log("closest value is " + closestPointReturn[2].toFixed(2));
 }
 
 
@@ -343,23 +364,25 @@ function closestPoint(m){
 	if (currentCircle == 1){
 		dataIndex=2;
 	}
-	var currentDistance, minDistance, xScaled, yScaled;
+	var currentDistance, minDistance, xScaled, yScaled, currentPointValue, closestPointValue;
 	minDistance = 100000;
 	//iterate to find closest point in new scheme
 	for (var i=0;i<data[dataIndex].points.length;i++){
 		xScaled = xScale(data[dataIndex].points[i].x.toFixed(2));
-		yScaled = yScale(data[dataIndex].points[i].y.toFixed(2));
+		yScaled = h - yScale(data[dataIndex].points[i].y.toFixed(2));
 		currentDistance = euclid ([m[0], m[1]], [xScaled, yScaled]);
-		
+		currentPointValue = data[dataIndex].points[i].u;
 		//find closest tick to current y position
 		if (currentDistance < minDistance){
+			closestPointValue = currentPointValue;
 			minDistance = currentDistance;
 			destinationX = xScaled;
 			destinationY = yScaled;
 			
 			}
 	}
-	return [destinationX, destinationY];    
+	
+	return [destinationX, destinationY, closestPointValue];    
 }
 
 
@@ -371,6 +394,7 @@ function updateSelector(){
 	drawAxes();
 	drawLine();
 	drawDragPoints();
+	drawTicks(1);
 }
 
 function drawNomo(){
