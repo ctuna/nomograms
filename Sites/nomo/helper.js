@@ -61,6 +61,7 @@ function init() {
 		drawLine();
 		drawDragPoints();
 	}
+	drawInputs();
 
 	
 //disable highlighting
@@ -424,6 +425,7 @@ function updateSelector(){
 	drawLine();
 	drawDragPoints();
 	drawTicks(1);
+	drawInputs();
 }
 
 function drawNomo(){
