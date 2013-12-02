@@ -175,7 +175,7 @@ function moveCircle(i){
 	}*/
 }
 
-var tickLength= 2 
+var tickLength = [3.0/4, 0.9/4, 0.5/4, 0.3/4, 0.2/4];
 var tickColors =[];
 function drawTicks(level){
 
@@ -193,10 +193,11 @@ function drawTicks(level){
 			.attr("x1", function (d)
 				{return xScale	(d.x) })
 			.attr("y1", function(d){return h - yScale(d.y)})
-			.attr("x2", function(d)	{return xScale((d.x + (tickLength*d.dy)))})
-			.attr("y2", function(d){return h - yScale((d.y - (tickLength*d.dx)))})
+			.attr("x2", function(d)	{return xScale((d.x + (tickLength[level]*d.dy)))})
+			.attr("y2", function(d){return h - yScale((d.y - (tickLength[level]*d.dx)))})
 			}
-			
+
+	if (level == 0) {
 			for (var axis = 0; axis < numAxes; axis ++){
 				myClass = "label-"+"axis"+axis+"-level"+level;
 				svg.selectAll("."+"myClass")
@@ -213,9 +214,10 @@ function drawTicks(level){
 					.text(function(d) { 
 						if (d.u.toFixed(0) == d.u.toFixed(2)){return d.u.toFixed(0);}
 						else return d.u.toFixed(2) })
-					//.attr("x2", function(d)	{return xScale((d.x + (tickLength*d.dy)))})
-					//.attr("y2", function(d){return h - yScale((d.y - (tickLength*d.dx)))})
+					//.attr("x2", function(d)	{return xScale((d.x + (tickLength[level]*d.dy)))})
+					//.attr("y2", function(d){return h - yScale((d.y - (tickLength[level]*d.dx)))})
 					}
+	}
 			
 			
 			
@@ -424,7 +426,9 @@ function updateSelector(){
 	drawAxes();
 	drawLine();
 	drawDragPoints();
+	drawTicks(0);
 	drawTicks(1);
+	drawTicks(2);
 	drawInputs();
 }
 
