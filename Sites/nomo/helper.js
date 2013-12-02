@@ -396,25 +396,32 @@ function closestPoint(m){
 		dataIndex = 1;
 	}
 	
-	var currentDistance, minDistance, xScaled, yScaled, currentPointValue, closestPointValue;
-	minDistance = 100000;
+	var minSqDistance, xScaled, yScaled, closestPointValue;
+	minSqDistance = 1e10;
+	var axisPoints = data[dataIndex].points;
+	var numPoints = axisPoints.length;
+	var mx = xScale.invert(m[0]);
+	var my = yScale.invert(h - m[1]);
+	var destXRaw, destYRaw;
 	//iterate to find closest point in new scheme
-	for (var i=0;i<data[dataIndex].points.length;i++){
-		xScaled = xScale(data[dataIndex].points[i].x.toFixed(2));
-		yScaled = h - yScale(data[dataIndex].points[i].y.toFixed(2));
-		currentDistance = euclid ([m[0], m[1]], [xScaled, yScaled]);
-		currentPointValue = data[dataIndex].points[i].u;
+	for (var i=0;i<numPoints;i++){
+		var point = axisPoints[i];
+		var px = point.x;
+		var py = point.y;
+		var currentSqDistance = (mx - px) * (mx - px) + (my - py) * (my - py);
 		//find closest tick to current y position
-		if (currentDistance < minDistance){
+		if (currentSqDistance < minSqDistance){
+			var currentPointValue = point.u;
 			closestPointValue = currentPointValue;
-			minDistance = currentDistance;
-			destinationX = xScaled;
-			destinationY = yScaled;
-			
+			minSqDistance = currentSqDistance;
+			destXRaw = px;
+			destYRaw = py;
 			}
 	}
 	closestCurrentPoints[dataIndex]=closestPointValue;
-	return [destinationX, destinationY, closestPointValue];    
+	xScaled = xScale(destXRaw);
+	yScaled = h - yScale(destYRaw);
+	return [xScaled, yScaled, closestPointValue];
 }
 
 
