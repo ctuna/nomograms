@@ -79,7 +79,7 @@ function drawInputs(){
 		.append("text")
 		.attr("class", myClass)
 		.attr("x", function(d, i){
-		return xScale(d3.mean(d.points, function(e) { return e.x; })).toFixed(2);} )
+		return xScale(d3.mean(d.points, function(e) { return e.x; }));} )
 		.attr("y", padding/2)
 		.text(function(d, i){return closestCurrentPoints[i].toFixed(2)})
 }
@@ -110,7 +110,7 @@ function drawLine(){
 				return d3.min(data[0].points, 
 						function(e) { return e.y; }) //a number
 							== d.y;
-							})[0].x.toFixed(2)
+							})[0].x
 						)
 					)
 			
@@ -118,7 +118,7 @@ function drawLine(){
 			
 			
 			
-		.attr("y1", yScale(d3.min(data[0].points, function(e) { return e.y; })).toFixed(2))//want highest
+		.attr("y1", yScale(d3.min(data[0].points, function(e) { return e.y; })))//want highest
 
 		
 		.attr("x2", xScale ( 
@@ -126,10 +126,10 @@ function drawLine(){
 				return d3.min(data[2].points, 
 						function(e) { return e.y; }) //a number
 							== d.y;
-							})[0].x.toFixed(2)
+							})[0].x
 						)
 					)
-		.attr("y2", yScale(d3.min(data[2].points, function(e) { return e.y; })).toFixed(2));//want min Y, highest*/ 
+		.attr("y2", yScale(d3.min(data[2].points, function(e) { return e.y; })));//want min Y, highest*/ 
 }
 function drawDragPoints(){
 
@@ -290,8 +290,8 @@ function drawAxes(){
 		.attr("width", w)
 		.attr("height", h);
 	var lineFunction = d3.svg.line()
-			.x(function(d) {return xScale(d.x.toFixed(2)) ; })
-			.y(function(d) {return h - yScale(d.y.toFixed(2)) ; })
+			.x(function(d) {return xScale(d.x) ; })
+			.y(function(d) {return h - yScale(d.y) ; })
 			.interpolate("linear");
 		console.log("in here");
 		//The line SVG Path we draw
@@ -311,7 +311,7 @@ function drawAxes(){
 				return d.name;
 			})
 			.attr("x", function(d){
-				return xScale(d3.mean(d.points, function(e) { return e.x; })).toFixed(2);
+				return xScale(d3.mean(d.points, function(e) { return e.x; }));
 			})	
 			.attr("y",function(d) {
 				return h - padding/2;  //line up all axes
