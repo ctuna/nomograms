@@ -175,6 +175,32 @@ function moveCircle(i){
 	}*/
 }
 
+var textDistance = [1.0, 1.0/4, 1.0/4, 1.0/4, 1.0/4];
+var halfEx = 6;
+
+function labelTransform(level, x, y, dx, dy) {
+	var dist = textDistance[level];
+	if (dy < 0) {
+		// flip
+		dx = -dx;
+		dy = -dy;
+		dist = -dist;
+	}
+	var tx = x + dist * dy;
+	var ty = y - dist * dx;
+	var e = xScale(tx) - halfEx * dx;
+	var f = h - yScale(ty) + halfEx * dy;
+	var a = dy;
+	var b = dx;
+	var c = -dx;
+	var d = dy;
+	return 'matrix(' + [a, b, c, d, e, f] + ')';
+}
+
+function labelAnchor(dy) {
+	return dy < 0 ? 'end' : 'start';
+}
+
 var tickLength = [3.0/4, 0.9/4, 0.5/4, 0.3/4, 0.2/4];
 var tickColors =[];
 function drawTicks(level){
@@ -208,9 +234,8 @@ function drawTicks(level){
 					//.attr("stroke-width", 2)
 					//.attr("fill", "none")
 					.attr("class", myClass)
-					.attr("x", function (d)
-						{return xScale	(d.x) })
-					.attr("y", function(d){return h - yScale(d.y)})
+					.attr("transform", function (d) { return labelTransform(level, d.x, d.y, d.dx, d.dy); })
+					.attr("text-anchor", function (d) { return labelAnchor(d.dy); })
 					.text(function(d) { 
 						if (d.u.toFixed(0) == d.u.toFixed(2)){return d.u.toFixed(0);}
 						else return d.u.toFixed(2) })
