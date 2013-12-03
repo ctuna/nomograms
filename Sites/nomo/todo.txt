@@ -1,0 +1,8 @@
+make drag in front (z order ticks in the back)
+extract value from current point
+scale ratio 
+1: calculate current
+2: display current
+wishes: label placement with simulated annealing? 
+concerns: label readability
+
