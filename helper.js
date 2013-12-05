@@ -186,6 +186,7 @@ function drawLine(){
 		.attr("y2", yScale(d3.min(data[2].points, function(e) { return e.y; })).toFixed(2));//want min Y, highest*/ 
 	
 	//initialize closest point labels
+	currentCircle = 0;
 	var leftCoords = [line.attr("x1"), line.attr("y1")];
 	closestCurrentPoints[0]=closestPoint(leftCoords)[2];
 	currentCircle = 1;
