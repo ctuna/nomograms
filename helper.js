@@ -11,7 +11,7 @@ var linePos = [];
 var circleRadius = 15;
 var points=[];
 var labelHeight = 50;
-var polyWidth = 130;
+var polyWidth = 100;
 var polyHeight=50;
 var startX;
 var startY;
@@ -68,6 +68,10 @@ function findIntersection(){
 			minDistance = currentDistance;
 			closestPoint = data[1].points[i]
 		}
+	}
+	if (minDistance >.1) {
+		//intersection = undefined;
+		return undefined;
 	}
 	intersection = closestPoint;
 	return closestPoint;
@@ -160,6 +164,9 @@ function drawInputs(){
 				}
 			else if (i == 1 && intersection != undefined ){
 				return intersection.u.toFixed(2);
+			}
+			else if (i == 1 && intersection == undefined){
+				return "";
 			}
 			else return closestCurrentPoints[2].toFixed(2);
 			})
