@@ -30,7 +30,7 @@ function wrangle(val){
 	else if (val == 'dubois'){data = dubois;}
 	else if (val == 'temp'){data = temp;}
 	else {
-		console.log("we went in bad place");
+		//console.log("we went in bad place");
 		data = BMI;
 	}
 
@@ -57,12 +57,32 @@ function updateLineEquation(){
 	//find a point on the middle axis that satisfies this formula
 }
 
-function isOnLine(x, y){
+var intersection;
+function findIntersection(){
+	var minDistance = 10000;
+	var currentDistance;
+	var closestPoint;
+	for (var i = 0; i<data[1].points.length; i++){
+		currentDistance = distanceToLine(data[1].points[i]);
+		if (currentDistance <minDistance){
+			minDistance = currentDistance;
+			closestPoint = data[1].points[i]
+		}
+	}
+	intersection = closestPoint;
+	return closestPoint;
+}
+
+
+
+function distanceToLine(point){
+	var x = point.x;
+	var y = point.y;
 	var last = m*xScale(x) + parseInt(b);
 	//console.log("y: "+ yScale(y) , "/x: " + xScale(x) + "/m: " + m + " /m*x = " + m*xScale(x) + " /b: " + b + "/m*x + b: " + last);
 	//return y == m*x + b;
 	//approximation
-	return Math.abs(yScale(y) - (m*xScale(x)+ b) ) <50;
+	return Math.abs((h - yScale(y)) - (m*xScale(x)+ b) ) ;
 }
 function init() {
 	//The SVG Container
@@ -103,12 +123,13 @@ var closestCurrentPoints=[5, 5, 5];
 
 function drawInputs(){
 	
-		console.log("LEFT: " + closestCurrentPoints[0] + "RIGHT: " + closestCurrentPoints[2]);
-	
+	//MAKE THE LABELS FOR CURRENT LINE VALS 
+	updateLineEquation();
+	findIntersection();
 	var myClass = "axisControl";
 	svg.selectAll("."+myClass).remove();
 	svg.selectAll("."+myClass)
-		.data(data.filter(function(d, i) { return i != 1 ; }))
+		.data(data)
 		.enter()
 		.append("text")
 		.attr("class", myClass)
@@ -122,10 +143,13 @@ function drawInputs(){
 		//change alignment
 		.attr("x", function(d, i){
 			if (i == 0){	return parseInt(line.attr("x1")) - polyWidth;}
-			else { return parseInt(line.attr("x2")) + polyWidth;}
+			else if (i == 1 && intersection != undefined ){ return xScale(intersection.x)}
+			else if (i == 2){ return parseInt(line.attr("x2")) + polyWidth;}
+			
 		})
 		.attr("y", function(d, i){
 			if (i == 0){ return	parseInt(line.attr("y1")) - (polyHeight/2);}
+			else if (i == 1 && intersection != undefined ){return h - yScale(intersection.y);}
 			else { return parseInt(line.attr("y2")) -  (polyHeight/2);}
 		})
 			//X SHOULD BE THE CURRENT POINT ON THIS AXIS
@@ -134,6 +158,9 @@ function drawInputs(){
 			if (i == 0) {
 				return closestCurrentPoints[0].toFixed(2);
 				}
+			else if (i == 1 && intersection != undefined ){
+				return intersection.u.toFixed(2);
+			}
 			else return closestCurrentPoints[2].toFixed(2);
 			})
 }
@@ -225,7 +252,7 @@ function clickCircle(i, clickevent){
 	svg.on("mousemove", mousemove);
 }
 function moveCircle(i){
-	console.log(d3.mouse(this));/**
+/**	console.log(d3.mouse(this));
 	if (i == 0){
 		line.attr("x1", m[0]);
 		line.attr("y1", m[1]);
@@ -319,7 +346,7 @@ function drawAxes(){
 	yScale = d3.scale.linear()
 		.domain([0, maxY])
 		.range([0+padding+ labelHeight, h - padding]);
-	console.log("h is initialized to: " + h);
+	//console.log("h is initialized to: " + h);
 	//now that we know width, make SVG
 	svg = d3.select("body").append("svg")
 	//TODO FIND OUT WHY THIS IS WEIRD
@@ -330,7 +357,7 @@ function drawAxes(){
 			.x(function(d) {return xScale(d.x.toFixed(2)) ; })
 			.y(function(d) {return h - yScale(d.y.toFixed(2)) ; })
 			.interpolate("linear");
-		console.log("in here");
+		//console.log("in here");
 		//The line SVG Path we draw
 	for (var i = 0; i < numAxes; i++){
 		//DRAW AXES
@@ -418,7 +445,7 @@ function mousemove() {
 		closestPointReturn = closestPoint(m)
 
 
-		console.log("CURRENT CIRCLE IS: "+ currentCircle);
+		//console.log("CURRENT CIRCLE IS: "+ currentCircle);
 		d3.selectAll("polygon")
 			.filter(function (d, i){ return i ==currentCircle;})
 			.attr("points",function(d, i) { 
@@ -504,6 +531,7 @@ function closestPoint(m){
 	else if (currentCircle == 2){
 		dataIndex = 1;
 	}
+	
 	
 	var currentDistance, minDistance, xScaled, yScaled, currentPointValue, closestPointValue;
 	minDistance = 100000;
