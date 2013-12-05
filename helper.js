@@ -42,8 +42,28 @@ function wrangle(val){
 		}
 	}	
 }
+	var m;
+	var b;
+function updateLineEquation(){
+	//motivated by y1-y2=m(x1-x2)
+	//caculate slope of current nomoline 
+	var y1 = parseInt(line.attr("y1"));
+	var y2 = parseInt(line.attr("y2"));
+	var x1 = parseInt(line.attr("x1"));
+	var x2 = parseInt(line.attr("x2"));
+	m = (y1-y2)/(x1-x2);
+	//y = mx + b therefore b = y - mx
+	b = y1 - (m*x1);
+	//find a point on the middle axis that satisfies this formula
+}
 
-
+function isOnLine(x, y){
+	var last = m*xScale(x) + parseInt(b);
+	//console.log("y: "+ yScale(y) , "/x: " + xScale(x) + "/m: " + m + " /m*x = " + m*xScale(x) + " /b: " + b + "/m*x + b: " + last);
+	//return y == m*x + b;
+	//approximation
+	return Math.abs(yScale(y) - (m*xScale(x)+ b) ) <50;
+}
 function init() {
 	//The SVG Container
 
