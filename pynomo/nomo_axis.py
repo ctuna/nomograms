@@ -269,6 +269,23 @@ class Nomo_Axis:
         dx_units_3,dy_units_3,angles_3=find_tick_directions(tick_3_list,f,g,self.side,start,stop,full_angle=self.axis_appear['full_angle'],extra_angle=self.axis_appear['extra_angle'],turn_relative=self.axis_appear['turn_relative'])
         dx_units_4,dy_units_4,angles_4=find_tick_directions(tick_4_list,f,g,self.side,start,stop,full_angle=self.axis_appear['full_angle'],extra_angle=self.axis_appear['extra_angle'],turn_relative=self.axis_appear['turn_relative'])
 
+        # let's save them
+        self.dx_units_0=dx_units_0
+        self.dx_units_1=dx_units_1
+        self.dx_units_2=dx_units_2
+        self.dx_units_3=dx_units_3
+        self.dx_units_4=dx_units_4
+        self.dy_units_0=dy_units_0
+        self.dy_units_1=dy_units_1
+        self.dy_units_2=dy_units_2
+        self.dy_units_3=dy_units_3
+        self.dy_units_4=dy_units_4
+        self.tick_0_list=tick_0_list
+        self.tick_1_list=tick_1_list
+        self.tick_2_list=tick_2_list
+        self.tick_3_list=tick_3_list
+        self.tick_4_list=tick_4_list
+
         # tick level 0
         if self.tick_levels>0:
             self._make_tick_lines_(tick_0_list,line,f,g,dx_units_0,dy_units_0,
@@ -362,6 +379,23 @@ class Nomo_Axis:
         dx_units_2_text,dy_units_2_text,angles_2_text=find_tick_directions(text_2_list,f,g,self.side,start,stop,full_angle=self.axis_appear['full_angle'],extra_angle=self.axis_appear['extra_angle'],turn_relative=self.axis_appear['turn_relative'])
         dx_units_3_text,dy_units_3_text,angles_3_text=find_tick_directions(text_3_list,f,g,self.side,start,stop,full_angle=self.axis_appear['full_angle'],extra_angle=self.axis_appear['extra_angle'],turn_relative=self.axis_appear['turn_relative'])
         dx_units_4_text,dy_units_4_text,angles_4_text=find_tick_directions(text_4_list,f,g,self.side,start,stop,full_angle=self.axis_appear['full_angle'],extra_angle=self.axis_appear['extra_angle'],turn_relative=self.axis_appear['turn_relative'])
+
+        # let's save them
+        self.dx_units_0=dx_units_0
+        self.dx_units_1=dx_units_1
+        self.dx_units_2=dx_units_2
+        self.dx_units_3=dx_units_3
+        self.dx_units_4=dx_units_4
+        self.dy_units_0=dy_units_0
+        self.dy_units_1=dy_units_1
+        self.dy_units_2=dy_units_2
+        self.dy_units_3=dy_units_3
+        self.dy_units_4=dy_units_4
+        self.tick_0_list=tick_0_list
+        self.tick_1_list=tick_1_list
+        self.tick_2_list=tick_2_list
+        self.tick_3_list=tick_3_list
+        self.tick_4_list=tick_4_list
 
         # tick level 0
         if self.tick_levels>0:
@@ -559,6 +593,11 @@ class Nomo_Axis:
         self.dx_units_2=dx_units_2
         self.dx_units_3=dx_units_3
         self.dx_units_4=dx_units_4
+        self.dy_units_0=dy_units_0
+        self.dy_units_1=dy_units_1
+        self.dy_units_2=dy_units_2
+        self.dy_units_3=dy_units_3
+        self.dy_units_4=dy_units_4
         self.tick_0_list=tick_0_list
         self.tick_1_list=tick_1_list
         self.tick_2_list=tick_2_list
@@ -635,6 +674,23 @@ class Nomo_Axis:
         dx_units_0,dy_units_0,angles_0=find_tick_directions(tick_0_list,f,g,self.side,start,stop,full_angle=self.axis_appear['full_angle'],extra_angle=self.axis_appear['extra_angle'],turn_relative=self.axis_appear['turn_relative'])
         dx_units_1,dy_units_1,angles_1=find_tick_directions(tick_1_list,f,g,self.side,start,stop,full_angle=self.axis_appear['full_angle'],extra_angle=self.axis_appear['extra_angle'],turn_relative=self.axis_appear['turn_relative'])
         dx_units_2,dy_units_2,angles_2=find_tick_directions(tick_2_list,f,g,self.side,start,stop,full_angle=self.axis_appear['full_angle'],extra_angle=self.axis_appear['extra_angle'],turn_relative=self.axis_appear['turn_relative'])
+
+        # let's save them
+        self.dx_units_0=dx_units_0
+        self.dx_units_1=dx_units_1
+        self.dx_units_2=dx_units_2
+        self.dx_units_3=[]
+        self.dx_units_4=[]
+        self.dy_units_0=dy_units_0
+        self.dy_units_1=dy_units_1
+        self.dy_units_2=dy_units_2
+        self.dy_units_3=[]
+        self.dy_units_4=[]
+        self.tick_0_list=tick_0_list
+        self.tick_1_list=tick_1_list
+        self.tick_2_list=tick_2_list
+        self.tick_3_list=[]
+        self.tick_4_list=[]
 
         # tick level 0
         if self.tick_levels>0:

@@ -2494,7 +2494,7 @@ class Nomo_Atom:
                 base_stop=p['u_max']
             else:
                 base_stop=p['base_stop']
-            Nomo_Axis(func_f=self.give_x,func_g=self.give_y,
+            self.axis = Nomo_Axis(func_f=self.give_x,func_g=self.give_y,
                       start=p['u_min'],stop=p['u_max'],
                       turn=-1,title=p['title'],canvas=canvas,type=p['scale_type'],
                       tick_levels=p['tick_levels'],tick_text_levels=p['tick_text_levels'],
@@ -2522,7 +2522,7 @@ class Nomo_Atom:
             #print self.u_min_ref
             #print "u_max_ref"
             #print self.u_max_ref
-            Nomo_Axis(func_f=self.give_x_ref,func_g=self.give_y_ref,
+            self.axis = Nomo_Axis(func_f=self.give_x_ref,func_g=self.give_y_ref,
             start=self.u_min_ref,stop=self.u_max_ref,
             turn=-1,title=p['title'],canvas=canvas,type=p['scale_type'],
             tick_levels=0,tick_text_levels=0,
