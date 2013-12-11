@@ -16,6 +16,16 @@ var polyHeight=50;
 var startX;
 var startY;
 var data;
+var LEFTKEYCODE=49;
+var MIDDLEKEYCODE = 50;
+var RIGHTKEYCODE = 51; 
+
+registerKeyboardHandler = function(callback) {
+	console.log("registering handler");
+  var callback = callback;
+  d3.select(window).on("keydown", callback);  
+};
+
 
 function wrangle(val){
 	data = [];
@@ -47,6 +57,7 @@ function wrangle(val){
 	var mTemp;
 	var bTemp;
 	
+
 function updateLineEquation(){
 
 	//motivated by y1-y2=m(x1-x2)
@@ -142,7 +153,18 @@ function init() {
 		
 	wrangle();
 	draw();
-
+	registerKeyboardHandler(function(){
+		var key = d3.event.keyCode;
+		if (key == LEFTKEYCODE){
+			console.log("left");
+		}
+		if (key == MIDDLEKEYCODE){
+			console.log("middle");
+		}
+		if (key == RIGHTKEYCODE){
+			console.log("right");
+		}
+		});
 	
 //disable highlighting
 
