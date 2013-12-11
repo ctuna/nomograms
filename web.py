@@ -25,17 +25,16 @@ def get_atom_data(atom):
     }
 
 # http://docs.python.org/2/library/ast.html#abstract-grammar
-allowedNodes = {
-    ast.BinOp,
-    ast.Add,
-    ast.Sub,
-    ast.Mult,
-    ast.Div,
-    ast.Pow,
-    ast.Num,
-    ast.Name,
-    ast.Load
-}
+allowedNodes = set()
+allowedNodes.add(ast.BinOp)
+allowedNodes.add(ast.Add)
+allowedNodes.add(ast.Sub)
+allowedNodes.add(ast.Mult)
+allowedNodes.add(ast.Div)
+allowedNodes.add(ast.Pow)
+allowedNodes.add(ast.Num)
+allowedNodes.add(ast.Name)
+allowedNodes.add(ast.Load)
 
 # http://docs.python.org/2/library/math.html
 allowedMath = {
