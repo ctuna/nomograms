@@ -61,14 +61,19 @@ function updateLineEquation(){
 	//find a point on the middle axis that satisfies this formula
 }
 
-
-function updateLineEquation(x1, y1, x2, y2){
+function updateTempLineEquation(x1, y1, x2, y2){
 
 	//motivated by y1-y2=m(x1-x2)
 	//caculate slope of current nomoline 
+
 	mTemp = (y1-y2)/(x1-x2);
 	//y = mx + b therefore b = y - mx
 	bTemp = y1 - (mTemp*x1);
+	
+	
+
+	
+	
 	//find a point on the middle axis that satisfies this formula
 }
 
@@ -83,8 +88,12 @@ function findIntersection(real){
 		var closestPoint;
 		//data[1] is middle axis
 		for (var i = 0; i<data[1].points.length; i++){
-			if (real){	currentDistance = distanceToLine(data[1].points[i], m, b);}
-			else { currentDistance = distanceToLine(data[1].points[i], mTemp, bTemp);}
+			if (real){	
+				currentDistance = distanceToLine(data[1].points[i], m, b);
+				}
+			else { 
+				currentDistance = distanceToLine(data[1].points[i], mTemp, bTemp);
+				}
 			if (currentDistance <minDistance){
 				minDistance = currentDistance;
 				closestPoint = data[1].points[i]
@@ -92,11 +101,15 @@ function findIntersection(real){
 		}
 		
 		if (minDistance >.1) {
-			//intersection = undefined;
+			intersection = undefined;
+		
 			return undefined;
 		}
-		intersection = closestPoint;
-		return closestPoint;
+		else{
+			//console.log("found an intersection");
+			intersection = closestPoint;
+			return closestPoint;
+		}
 	}
 	
 	
@@ -145,6 +158,7 @@ function draw(){
 		drawPointers();
 		//drawDragPoints();
 	}
+	constructValidPoints();
 	drawInputs();
 }
 var closestCurrentPoints=[5, 5, 5];
@@ -276,11 +290,13 @@ function drawDragPoints(){
 		.attr("r", circleRadius)
 		.attr("class", "dragpoint")
 		.on("mousedown", function(d, i){clickCircle(i, this)})
-		.on("mouseup", mouseup);
+		//.on("mouseup", mouseup);
 	svg.on("mouseup", mouseup);
 		
 		
 }
+
+var dirty=false;
 
 var currentCircle;
 function clickCircle(i, clickevent){
@@ -466,7 +482,8 @@ function getY(s){
 }
 
 function mousemove() {
-
+	
+	dirty=true;
 	var m = d3.mouse(this);
 
     var closestPointReturn;
@@ -533,6 +550,10 @@ function mousemove() {
 
 
 function mouseup() {
+	if (dirty){
+		dirty=false;
+	 	constructValidPoints();
+	}
 	 svg.on("mousemove", null);
 //	var closest = closestTick(this);
 	//line.attr("y1", closest[1]); 	//change position to closest position
@@ -567,22 +588,32 @@ function closestTick(event){
 	}
 	return [closestTickIndex, destinationY];    
 }
-
+var RIGHT = 1;
+var LEFT = 0;
 function hasIntersection(checkX, checkY){	
-	if (currentCircle == 1){
+	if (currentCircle == RIGHT){
 		//RIGHT AXIS
-		updateLineEquation(parseInt(line.attr("x1")), parseInt(line.attr("y1")), checkX, checkY); 
+		updateTempLineEquation(parseInt(line.attr("x1")), parseInt(line.attr("y1")), checkX, checkY); 
 		//console.log("calling from hasIntersection on right");
-		return (findIntersection(false)!= undefined);
+		if (findIntersection(false)== undefined){
+			//console.log("no intersection");
+			return false
+		}
+		else return true;
 	}
-	else if (currentCircle == 2){
+	else if (currentCircle == LEFT){
 		//LEFT AXIS		
-		updateLineEquation(checkX, checkY, parseInt(line.attr("x2")), parseInt(line.attr("y2")));
-		//console.log("calling from hasIntersection on left");
-		return (findIntersection(false)!= undefined);
+		updateTempLineEquation(checkX, checkY, parseInt(line.attr("x2")), parseInt(line.attr("y2")));
+		if (findIntersection(false)== undefined){
+			return false
+		}
+		else{
+		
+			return true;
+		} 	
 	}
 	else {
-		//console.log("neither circle");
+		console.log("neither circle");
 		return true;
 	}	
 }
@@ -599,7 +630,7 @@ function closestPoint(m){
 	}
 	
 	
-	var minSqDistance, xScaled, yScaled, closestPointValue;
+	var minSqDistance, closestXScaled, closestYScaled, closestPointValue;
 	minSqDistance = 1e10;
 	var axisPoints = data[dataIndex].points;
 	var numPoints = axisPoints.length;
@@ -608,29 +639,48 @@ function closestPoint(m){
 	var destXRaw, destYRaw;
 	//iterate to find closest point in new scheme
 	for (var i=0;i<numPoints;i++){
+	
 		var point = axisPoints[i];
 		var px = point.x;
 		var py = point.y;
 		var currentSqDistance = (mx - px) * (mx - px) + (my - py) * (my - py);
+		if (i == 0){
+					//INITIALIZE
+				closestXScaled = xScale(px);
+				closestYScaled = yScale(py);
+				closestPointValue=point.u;
+		}
 		//find closest tick to current y position
 
 		if (currentSqDistance < minSqDistance){
 			destXRaw = px;
 			destYRaw = py;
-			xScaled = xScale(destXRaw);
-			yScaled = h - yScale(destYRaw);
-			if (hasIntersection(xScaled, yScaled)){
+			var xScaled = xScale(destXRaw);
+			var yScaled = h - yScale(destYRaw);
+			var isValid;
+			//ITERATING THE LEFT SIDE
+			if (dataIndex == 0){
+				isValid = validPointsLeft[i];
+			}
+			//ITERATING RIGHT SIDE 
+			else if (dataIndex == 2){
+				isValid = validPointsRight[i];
+			}
+			if (isValid){
 					var currentPointValue = point.u;
 					closestPointValue = currentPointValue;
 					minSqDistance = currentSqDistance;
-				}
+					closestXScaled = xScaled;
+					closestYScaled = yScaled;
+			}
+		
+			
 
 		}
 	}
 	closestCurrentPoints[dataIndex]=closestPointValue;
-	xScaled = xScale(destXRaw);
-	yScaled = h - yScale(destYRaw);
-	return [xScaled, yScaled, closestPointValue];
+
+	return [closestXScaled, closestYScaled, closestPointValue];
 }
 
 
@@ -683,7 +733,9 @@ function drawPointers(){
 function updateSelector(){
 	d = this.value;
 	wrangle(d);
+	
 	draw();
+
 }
 
 function drawNomo(){
@@ -719,3 +771,47 @@ function euclid(a, b) {
   }
   return Math.sqrt(sum);
 }
+
+var validPointsLeft=[];
+var validPointsRight=[];
+
+
+
+
+function constructValidPoints(){	
+	console.log("constructing valid points....");
+	//ITERATE THROUGH POINTS ON LEFT AXIS, RIGHT AXIS STAYS FIXED
+	var axisPoints = data[0].points;
+	var numPoints = axisPoints.length;
+	for (var i=0;i<numPoints;i++){
+		var point = axisPoints[i];
+		var px = point.x;
+		var py = point.y;
+		updateTempLineEquation(xScale(px), h - yScale(py), parseInt(line.attr("x2")), parseInt(line.attr("y2")));
+		if (findIntersection(false)== undefined){
+			validPointsLeft[i]=false;
+		}
+		else {
+			validPointsLeft[i]=true;
+			}
+
+	}
+	
+	axisPoints = data[2].points;
+	numPoints = axisPoints.length;
+	for (var i=0;i<numPoints;i++){
+		var point = axisPoints[i];
+		var px = point.x;
+		var py = point.y;
+		updateTempLineEquation(parseInt(line.attr("x1")), parseInt(line.attr("y1")), xScale(px), h - yScale(py)); 
+		if (findIntersection(false)== undefined){
+			validPointsRight[i]=false;
+		}
+		else {
+			validPointsRight[i]=true;
+			}
+	}
+}
+	
+	
+
