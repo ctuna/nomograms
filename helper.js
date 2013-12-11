@@ -68,7 +68,9 @@ function init() {
 
 function draw(){
 	drawAxes();
+	drawTicks(0);
 	drawTicks(1);
+	drawTicks(2);
 	if (numAxes > 2){
 		drawLine();
 		drawPointers();
@@ -144,7 +146,7 @@ function drawLine(){
 				return d3.min(data[0].points, 
 						function(e) { return e.y; }) //a number
 							== d.y;
-							})[0].x.toFixed(2)
+							})[0].x
 						)
 					)
 			
@@ -152,7 +154,7 @@ function drawLine(){
 			
 			
 			
-		.attr("y1", yScale(d3.min(data[0].points, function(e) { return e.y; })).toFixed(2))//want highest
+		.attr("y1", yScale(d3.min(data[0].points, function(e) { return e.y; })))//want highest
 
 		
 		.attr("x2", xScale ( 
@@ -160,10 +162,10 @@ function drawLine(){
 				return d3.min(data[2].points, 
 						function(e) { return e.y; }) //a number
 							== d.y;
-							})[0].x.toFixed(2)
+							})[0].x
 						)
 					)
-		.attr("y2", yScale(d3.min(data[2].points, function(e) { return e.y; })).toFixed(2));//want min Y, highest*/ 
+		.attr("y2", yScale(d3.min(data[2].points, function(e) { return e.y; })));//want min Y, highest*/ 
 	
 	//initialize closest point labels
 	var leftCoords = [line.attr("x1"), line.attr("y1")];
@@ -216,7 +218,33 @@ function moveCircle(i){
 	}*/
 }
 
-var tickLength= 2 
+var textDistance = [1.0, 1.0/4, 1.0/4, 1.0/4, 1.0/4];
+var halfEx = 6;
+
+function labelTransform(level, x, y, dx, dy) {
+	var dist = textDistance[level];
+	if (dy < 0) {
+		// flip
+		dx = -dx;
+		dy = -dy;
+		dist = -dist;
+	}
+	var tx = x + dist * dy;
+	var ty = y - dist * dx;
+	var e = xScale(tx) - halfEx * dx;
+	var f = h - yScale(ty) + halfEx * dy;
+	var a = dy;
+	var b = dx;
+	var c = -dx;
+	var d = dy;
+	return 'matrix(' + [a, b, c, d, e, f] + ')';
+}
+
+function labelAnchor(dy) {
+	return dy < 0 ? 'end' : 'start';
+}
+
+var tickLength = [3.0/4, 0.9/4, 0.5/4, 0.3/4, 0.2/4];
 var tickColors =[];
 function drawTicks(level){
 
@@ -234,10 +262,11 @@ function drawTicks(level){
 			.attr("x1", function (d)
 				{return xScale	(d.x) })
 			.attr("y1", function(d){return h - yScale(d.y)})
-			.attr("x2", function(d)	{return xScale((d.x + (tickLength*d.dy)))})
-			.attr("y2", function(d){return h - yScale((d.y - (tickLength*d.dx)))})
+			.attr("x2", function(d)	{return xScale((d.x + (tickLength[level]*d.dy)))})
+			.attr("y2", function(d){return h - yScale((d.y - (tickLength[level]*d.dx)))})
 			}
-			
+
+	if (level == 0) {
 			for (var axis = 0; axis < numAxes; axis ++){
 				myClass = "label-"+"axis"+axis+"-level"+level;
 				svg.selectAll("."+"myClass")
@@ -248,15 +277,15 @@ function drawTicks(level){
 					//.attr("stroke-width", 2)
 					//.attr("fill", "none")
 					.attr("class", myClass)
-					.attr("x", function (d)
-						{return xScale	(d.x) })
-					.attr("y", function(d){return h - yScale(d.y)})
+					.attr("transform", function (d) { return labelTransform(level, d.x, d.y, d.dx, d.dy); })
+					.attr("text-anchor", function (d) { return labelAnchor(d.dy); })
 					.text(function(d) { 
 						if (d.u.toFixed(0) == d.u.toFixed(2)){return d.u.toFixed(0);}
 						else return d.u.toFixed(2) })
-					//.attr("x2", function(d)	{return xScale((d.x + (tickLength*d.dy)))})
-					//.attr("y2", function(d){return h - yScale((d.y - (tickLength*d.dx)))})
+					//.attr("x2", function(d)	{return xScale((d.x + (tickLength[level]*d.dy)))})
+					//.attr("y2", function(d){return h - yScale((d.y - (tickLength[level]*d.dx)))})
 					}
+	}
 			
 			
 			
@@ -306,8 +335,8 @@ function drawAxes(){
 		.attr("height", h+ labelHeight);
 		
 	var lineFunction = d3.svg.line()
-			.x(function(d) {return xScale(d.x.toFixed(2)) ; })
-			.y(function(d) {return h - yScale(d.y.toFixed(2)) ; })
+			.x(function(d) {return xScale(d.x) ; })
+			.y(function(d) {return h - yScale(d.y) ; })
 			.interpolate("linear");
 		console.log("in here");
 		//The line SVG Path we draw
@@ -328,7 +357,7 @@ function drawAxes(){
 				return d.name;
 			})
 			.attr("x", function(d){
-				return xScale(d3.mean(d.points, function(e) { return e.x; })).toFixed(2);
+				return xScale(d3.mean(d.points, function(e) { return e.x; }));
 			})	
 			.attr("y",function(d) {
 				return h - padding/2;  //line up all axes
@@ -484,25 +513,32 @@ function closestPoint(m){
 		dataIndex = 1;
 	}
 	
-	var currentDistance, minDistance, xScaled, yScaled, currentPointValue, closestPointValue;
-	minDistance = 100000;
+	var minSqDistance, xScaled, yScaled, closestPointValue;
+	minSqDistance = 1e10;
+	var axisPoints = data[dataIndex].points;
+	var numPoints = axisPoints.length;
+	var mx = xScale.invert(m[0]);
+	var my = yScale.invert(h - m[1]);
+	var destXRaw, destYRaw;
 	//iterate to find closest point in new scheme
-	for (var i=0;i<data[dataIndex].points.length;i++){
-		xScaled = xScale(data[dataIndex].points[i].x.toFixed(2));
-		yScaled = h - yScale(data[dataIndex].points[i].y.toFixed(2));
-		currentDistance = euclid ([m[0], m[1]], [xScaled, yScaled]);
-		currentPointValue = data[dataIndex].points[i].u;
+	for (var i=0;i<numPoints;i++){
+		var point = axisPoints[i];
+		var px = point.x;
+		var py = point.y;
+		var currentSqDistance = (mx - px) * (mx - px) + (my - py) * (my - py);
 		//find closest tick to current y position
-		if (currentDistance < minDistance){
+		if (currentSqDistance < minSqDistance){
+			var currentPointValue = point.u;
 			closestPointValue = currentPointValue;
-			minDistance = currentDistance;
-			destinationX = xScaled;
-			destinationY = yScaled;
-			
+			minSqDistance = currentSqDistance;
+			destXRaw = px;
+			destYRaw = py;
 			}
 	}
 	closestCurrentPoints[dataIndex]=closestPointValue;
-	return [destinationX, destinationY, closestPointValue];    
+	xScaled = xScale(destXRaw);
+	yScaled = h - yScale(destYRaw);
+	return [xScaled, yScaled, closestPointValue];
 }
 
 
