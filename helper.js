@@ -24,9 +24,14 @@ registerKeyboardHandler = function(callback) {
 	console.log("registering handler");
   var callback = callback;
   d3.select(window).on("keydown", callback);  
+
+  
 };
 
 
+var pathleft;
+var pathright;
+var pathmiddle;
 function wrangle(val){
 	data = [];
 	if (val === 'retainingWall'){data=retainingWall;}
@@ -153,16 +158,23 @@ function init() {
 		
 	wrangle();
 	draw();
+	d3.select(window).on("keyup", function(){
+			svg.select("path#id0").attr("stroke", "black");
+			svg.select("path#id1").attr("stroke", "black");
+			svg.select("path#id2").attr("stroke", "black");
+		});
+					
 	registerKeyboardHandler(function(){
 		var key = d3.event.keyCode;
+	
 		if (key == LEFTKEYCODE){
-			console.log("left");
+			svg.select("path#id0").attr("stroke", "blue");
 		}
 		if (key == MIDDLEKEYCODE){
-			console.log("middle");
+			svg.select("path#id1").attr("stroke", "blue");
 		}
 		if (key == RIGHTKEYCODE){
-			console.log("right");
+			svg.select("path#id2").attr("stroke", "blue");
 		}
 		});
 	
@@ -467,6 +479,7 @@ function drawAxes(){
 			.attr("d", lineFunction(data[i].points))
 			.attr("stroke", "black")
 			.attr("stroke-width", 2)
+			.attr("id", "id"+ i)
 			.attr("fill", "none")
 			.attr("class", "axis");
 		//LABEL THE AXES
