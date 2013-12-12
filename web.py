@@ -1,4 +1,5 @@
-import ast, math, json, flask
+import ast, math, json, os
+import flask
 import pynomo.nomographer
 
 def get_ticks_sub(f, g, tick_list, dx_units, dy_units):
@@ -101,4 +102,4 @@ def main():
     return (json.dumps(out), 200, {'Content-Type': 'application/json'})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', '5000')))
