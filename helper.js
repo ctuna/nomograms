@@ -519,19 +519,48 @@ function getY(s){
         return s.split(',')[1].split(')')[0];
 }
 
+var STATIC_PTS = [
+	0, 0,
+	polyWidth / 4, -polyHeight / 2,
+	polyWidth, -polyHeight / 2,
+	polyWidth, polyHeight / 2,
+	polyWidth / 4, polyHeight / 2
+].join(',');
+
+function handleTransform(ref, near, scale) {
+	var tx = ref.x;
+	var ty = ref.y;
+	var dx = tx - near.x;
+	var dy = ty - near.y;
+	var s = scale / Math.sqrt(dx * dx + dy * dy);
+	var e = xScale(tx);
+	var f = h - yScale(ty);
+	var a = dy * s;
+	var b = dx * s;
+	var c = -b;
+	var d = a;
+	return 'matrix(' + [a, b, c, d, e, f] + ')';
+}
+
 function mousemove() {
         
         dirty=true;
         var m = d3.mouse(this);
 
     var closestPointReturn;
-                var currentX;
-                var currentY;
                 var prevM = m;
                 var prevB = b;
         
                 //find closest point
                 closestPointReturn = closestPoint(m)
+	var polyScale = -1;
+	var axisPoints = data[currentCircle].points;
+	var refIndex = closestPointReturn[3];
+	var nearIndex = refIndex - 2;
+	if (nearIndex < 0) {
+		nearIndex = refIndex + 2;
+		polyScale *= -1;
+	}
 
 
                 //console.log("CURRENT CIRCLE IS: "+ currentCircle);
@@ -542,54 +571,16 @@ function mousemove() {
 								return i == 1;
 							}
 							else return (i == currentCircle);})
-						
-                        .attr("points",function(d, i) { 
-                                var pts = [];
-                                currentX = closestPointReturn[0];
-                                currentY = closestPointReturn[1];
-                                
-                                
-                                
-                                //retreive polygon origin 
-                                if (currentCircle == LEFT){
-                                        console.log("LEFT");
-                                                
-                                        //NEW LINE
-                                
-                                        
-                                        startX =  closestPointReturn[0];
-                                        startY = closestPointReturn[1];
-                                        line.attr("x1", closestPointReturn[0]);
-                                        line.attr("y1", closestPointReturn[1]);
-										intersections[LEFT] = {x:closestPointReturn[0], y:closestPointReturn[1]};
-                                        //console.log("aaaaaaaaa");
-                                        pts = [startX, startY, 
-                                                        startX-(polyWidth/4), startY - (polyHeight/2), 
-                                                        startX - polyWidth, startY - (polyHeight/2),
-                                                        startX - polyWidth, startY + (polyHeight/2),
-                                                        startX - (polyWidth/4), startY + (polyHeight/2)
-                                                                        ];                
-                                }
-                                else if (currentCircle == RIGHT) {
-										console.log("RIGHt");
-                                        //console.log("AAAAAAAAAAAAAA");
-                                                        startX =  closestPointReturn[0];
-                                                        startY = closestPointReturn[1];
-                                                        line.attr("x2", closestPointReturn[0]);
-                                                        line.attr("y2", closestPointReturn[1]);
-														intersections[RIGHT] = {x:closestPointReturn[0], y:closestPointReturn[1]};
-                                        pts = [startX, startY, 
-                                                        startX+(polyWidth/4), startY - (polyHeight/2), 
-                                                        startX + polyWidth, startY - (polyHeight/2),
-                                                        startX + polyWidth, startY + (polyHeight/2),
-                                                        startX + (polyWidth/4), startY + (polyHeight/2)
-                                                                        ];
-                                }
-                                
-                                return pts.join(",");
-                        })
-                        
-                
+		.attr("points", STATIC_PTS)
+		.attr("transform", handleTransform(axisPoints[refIndex], axisPoints[nearIndex], polyScale));
+	if (currentCircle == LEFT) {
+		line.attr("x1", closestPointReturn[0]);
+		line.attr("y1", closestPointReturn[1]);
+	} else if (currentCircle == RIGHT) {
+		line.attr("x2", closestPointReturn[0]);
+		line.attr("y2", closestPointReturn[1]);
+	}
+
                 drawInputs();
 
 }
@@ -680,7 +671,7 @@ function closestPoint(m){
                 dataIndex = 2;
         }
         
-        var minSqDistance, closestXScaled, closestYScaled, closestPointValue;
+        var minSqDistance, closestXScaled, closestYScaled, closestPointValue, closestPointIndex;
         minSqDistance = 1e10;
         var axisPoints = data[dataIndex].points;
         var numPoints = axisPoints.length;
@@ -719,6 +710,7 @@ function closestPoint(m){
                         if (isValid){
                                         var currentPointValue = point.u;
                                         closestPointValue = currentPointValue;
+	                                      closestPointIndex = i;
                                         minSqDistance = currentSqDistance;
                                         closestXScaled = xScaled;
                                         closestYScaled = yScaled;
@@ -730,7 +722,7 @@ function closestPoint(m){
         }
         closestCurrentPoints[dataIndex]=closestPointValue;
 
-        return [closestXScaled, closestYScaled, closestPointValue];
+        return [closestXScaled, closestYScaled, closestPointValue, closestPointIndex];
 }
 
 
