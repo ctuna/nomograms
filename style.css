@@ -12,6 +12,11 @@ body{
 line{
 		z-index:0;
 }
+
+#equation{
+	font-size:200%;
+	color: #4480d2;
+}
 .axis text {  
 	z-index:1;
     font-size: 50px;
@@ -44,6 +49,10 @@ polygon {
 	 z-index:5;
 	 width: 5px;
 	stroke: #4480d2;
+}
+.axisType{
+	font-size: 180%;
+	fill: #4480d2;
 }
 input{
   width: 30px;

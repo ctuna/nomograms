@@ -22,6 +22,8 @@ var RIGHTKEYCODE = 51;
 var xScale;
 var yScale;
 var labelPadding = 50;
+var equationHeight = 50;
+var buttonHeight = 50;
 
 registerKeyboardHandler = function(callback) {
         console.log("registering handler");
@@ -35,7 +37,33 @@ registerKeyboardHandler = function(callback) {
 var pathleft;
 var pathright;
 var pathmiddle;
+
+function updateEquationText(val){
+	
+	
+	 if (val === 'retainingWall'){
+		document.getElementById('equation').innerHTML ='<a>	(1+L)h^2 - Lh(1 + p) - 1/3(1-L)(1+2p)=0</a>';
+
+	}
+        else if (val === 'secondOrder'){
+			document.getElementById('equation').innerHTML ='<a>z^2 + pz + q = 0</a>';}
+              
+                
+        else if (val === 'BMI'){	
+			document.getElementById('equation').innerHTML ='<a>BMI = pounds*4.88 / (feet)^2</a>';}
+        else if (val == 'dubois'){
+			document.getElementById('equation').innerHTML ='<a>BSA = (71.84 x weight(kg)^.425 x height(cm)^.725)/10000</a>';}
+
+        else {
+                //console.log("we went in bad place");
+                document.getElementById('equation').innerHTML ='<a>BMI = pounds*4.88 / (feet)^2</a>';}
+        
+
+	  
+
+}
 function wrangle(val){
+		updateEquationText(val);
         data = [];
         if (val === 'retainingWall'){data=retainingWall;}
         else if (val === 'secondOrder'){
@@ -488,16 +516,19 @@ function drawAxes(){
                 svg.selectAll("text")
                         .data(data)
                         .enter()
+						
                         .append("text")
-                        .text(function(d) {
-                                return d.name;
+                        .text(function(d, i) {	
+                                return (i + 1) + ": " + d.name;
                         })
+						.attr("class", "axisType")
                         .attr("x", function(d){
-                                return xScale(d3.mean(d.points, function(e) { return e.x; }));
+                                return xScale(d3.mean(d.points, function(e) { return e.x; }) );
                         })        
                         .attr("y",function(d) {
-                                return h - padding/2;  //line up all axes
+                                return h;  //line up all axes
                 })
+
 
         
         
