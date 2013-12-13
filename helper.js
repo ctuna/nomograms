@@ -252,18 +252,9 @@ function drawInputs(){
                 })
                         //X SHOULD BE THE CURRENT POINT ON THIS AXIS
 
-                .text(function(d, i){
-                        if (i == 0) {
-                                return closestCurrentPoints[0].toFixed(2);
-                                }
-                        else if (i == 1 && intersection != undefined ){
-                                return intersection.u.toFixed(2);
-                        }
-                        else if (i == 1 && intersection == undefined){
-                                return "";
-                        }
-                        else return closestCurrentPoints[2].toFixed(2);
-                        })
+		.text(function(d, i){
+			return data[i].points[isoplethIndices[i]].u.toFixed(2);
+		})
 }
 
 /**
@@ -604,17 +595,14 @@ function mousemove() {
 		})
 		.attr("transform", handleTransformFromIndices(currentCircle, closestPointReturn[3]));
 
-	// TODO: need to choose two out of the three:
-	//    intersections[fixed]
-	//    intersections[currentCircle]
-	//    intersections[otherAxis]
-	// that result in the longets line
-	line.attr("x1", intersections[fixed].x);
-	line.attr("y1", intersections[fixed].y);
-	line.attr("x2", intersections[currentCircle].x);
-	line.attr("y2", intersections[currentCircle].y);
+	// HACK: always use LEFT and RIGHT
+	// this should probably figure out the longest line
+	line.attr("x1", intersections[LEFT].x);
+	line.attr("y1", intersections[LEFT].y);
+	line.attr("x2", intersections[RIGHT].x);
+	line.attr("y2", intersections[RIGHT].y);
 
-	// %%% drawInputs();
+	drawInputs();
 }
 
 
