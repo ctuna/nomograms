@@ -21,7 +21,7 @@ var MIDDLEKEYCODE = 50;
 var RIGHTKEYCODE = 51; 
 
 registerKeyboardHandler = function(callback) {
-	console.log("registering handler");
+        console.log("registering handler");
   var callback = callback;
   d3.select(window).on("keydown", callback);  
 
@@ -33,167 +33,168 @@ var pathleft;
 var pathright;
 var pathmiddle;
 function wrangle(val){
-	data = [];
-	if (val === 'retainingWall'){data=retainingWall;}
-	else if (val === 'secondOrder'){
-		//these come in in wrong order
-		data[0]=secondOrder[0];
-		data[1]=secondOrder[2];
-		data[2]=secondOrder[1];
-		}
-	else if (val === 'BMI'){data=BMI;}
-	else if (val == 'dubois'){data = dubois;}
-	else if (val == 'temp'){data = temp;}
-	else {
-		//console.log("we went in bad place");
-		data = BMI;
-	}
+        data = [];
+        if (val === 'retainingWall'){data=retainingWall;}
+        else if (val === 'secondOrder'){
+                //these come in in wrong order
+                data[0]=secondOrder[0];
+                data[1]=secondOrder[2];
+                data[2]=secondOrder[1];
+                }
+        else if (val === 'BMI'){data=BMI;}
+        else if (val == 'dubois'){data = dubois;}
+        else if (val == 'temp'){data = temp;}
+        else {
+                //console.log("we went in bad place");
+                data = BMI;
+        }
 
-	numAxes = data.length;
-	for (var i = 0; i <numAxes; i++){
-		axisNames[i]= data[i].name;
-		for (var p = 0; p < data[i].points.length; p++){
-			points[i]=data[i].points;
-		}
-	}	
+        numAxes = data.length;
+        for (var i = 0; i <numAxes; i++){
+                axisNames[i]= data[i].name;
+                for (var p = 0; p < data[i].points.length; p++){
+                        points[i]=data[i].points;
+                }
+        }        
 }
-	var m;
-	var b;
-	var mTemp;
-	var bTemp;
-	
+        var m;
+        var b;
+        var mTemp;
+        var bTemp;
+        
 
 function updateLineEquation(){
 
-	//motivated by y1-y2=m(x1-x2)
-	//caculate slope of current nomoline 
-	var y1 = parseInt(line.attr("y1"));
-	var y2 = parseInt(line.attr("y2"));
-	var x1 = parseInt(line.attr("x1"));
-	var x2 = parseInt(line.attr("x2"));
-	m = (y1-y2)/(x1-x2);
-	//y = mx + b therefore b = y - mx
-	b = y1 - (m*x1);
-	//find a point on the middle axis that satisfies this formula
+        //motivated by y1-y2=m(x1-x2)
+        //caculate slope of current nomoline 
+        var y1 = parseInt(line.attr("y1"));
+        var y2 = parseInt(line.attr("y2"));
+        var x1 = parseInt(line.attr("x1"));
+        var x2 = parseInt(line.attr("x2"));
+        m = (y1-y2)/(x1-x2);
+        //y = mx + b therefore b = y - mx
+        b = y1 - (m*x1);
+        //find a point on the middle axis that satisfies this formula
 }
 
 function updateTempLineEquation(x1, y1, x2, y2){
 
-	//motivated by y1-y2=m(x1-x2)
-	//caculate slope of current nomoline 
+        //motivated by y1-y2=m(x1-x2)
+        //caculate slope of current nomoline 
 
-	mTemp = (y1-y2)/(x1-x2);
-	//y = mx + b therefore b = y - mx
-	bTemp = y1 - (mTemp*x1);
-	
-	
+        mTemp = (y1-y2)/(x1-x2);
+        //y = mx + b therefore b = y - mx
+        bTemp = y1 - (mTemp*x1);
+        
+        
 
-	
-	
-	//find a point on the middle axis that satisfies this formula
+        
+        
+        //find a point on the middle axis that satisfies this formula
 }
 
 var intersection;
 
 
 
-function findIntersection(real){
-	
-		var minDistance = 10000;
-		var currentDistance;
-		var closestPoint;
-		//data[1] is middle axis
-		for (var i = 0; i<data[1].points.length; i++){
-			if (real){	
-				currentDistance = distanceToLine(data[1].points[i], m, b);
-				}
-			else { 
-				currentDistance = distanceToLine(data[1].points[i], mTemp, bTemp);
-				}
-			if (currentDistance <minDistance){
-				minDistance = currentDistance;
-				closestPoint = data[1].points[i]
-			}
-		}
-		
-		if (minDistance >.1) {
-			intersection = undefined;
-		
-			return undefined;
-		}
-		else{
-			//console.log("found an intersection");
-			intersection = closestPoint;
-			return closestPoint;
-		}
-	}
-	
-	
+function findIntersection(real, axis){
+        
+                var minDistance = 10000;
+                var currentDistance;
+                var closestPoint;
+                //data[1] is middle axis
+                for (var i = 0; i<data[axis].points.length; i++){
+                        if (real){        
+                                currentDistance = distanceToLine(data[axis].points[i], m, b);
+                                }
+                        else { 
+                                currentDistance = distanceToLine(data[axis].points[i], mTemp, bTemp);
+                                }
+                        if (currentDistance <minDistance){
+                                minDistance = currentDistance;
+                                closestPoint = data[axis].points[i]
+                        }
+                }
+                
+                if (minDistance >.1) {
+                        intersection = undefined;
+                
+                        return undefined;
+                }
+                else{
+                        //console.log("found an intersection");
+                        intersection = closestPoint;
+						intersections[MIDDLE] = closestPoint;
+                        return closestPoint;
+                }
+        }
+        
+        
 
 
 
 
 function distanceToLine(point, currentM, currentB){
-	var x = point.x;
-	var y = point.y;
-	var last = currentM*xScale(x) + parseInt(currentB);
-	//console.log("y: "+ yScale(y) , "/x: " + xScale(x) + "/m: " + m + " /m*x = " + m*xScale(x) + " /b: " + b + "/m*x + b: " + last);
-	//return y == m*x + b;
-	//approximation
-	return Math.abs((h - yScale(y)) - (currentM*xScale(x)+ currentB) ) ;
+        var x = point.x;
+        var y = point.y;
+        var last = currentM*xScale(x) + parseInt(currentB);
+        //console.log("y: "+ yScale(y) , "/x: " + xScale(x) + "/m: " + m + " /m*x = " + m*xScale(x) + " /b: " + b + "/m*x + b: " + last);
+        //return y == m*x + b;
+        //approximation
+        return Math.abs((h - yScale(y)) - (currentM*xScale(x)+ currentB) ) ;
 }
 function init() {
-	//The SVG Container
+        //The SVG Container
 
 
-	tickColors = ["#444445", "#747475", "#adadae", "#e4e4e4", "#e4e4e4"];
-	//padding= circleRadius*3;
-	d3.select("#selector")
-		.on("change", updateSelector)
-		.selectAll("option.auto")
-		.data(plist).enter()
-		.append("option")
-		.attr("value", function(d) { return d; })
-		.text(function(d) { return pname[d]; });
-		
-	wrangle();
-	draw();
-	d3.select(window).on("keyup", function(){
-			svg.select("path#id0").attr("stroke", "black");
-			svg.select("path#id1").attr("stroke", "black");
-			svg.select("path#id2").attr("stroke", "black");
-		});
-					
-	registerKeyboardHandler(function(){
-		var key = d3.event.keyCode;
-	
-		if (key == LEFTKEYCODE){
-			svg.select("path#id0").attr("stroke", "blue");
-		}
-		if (key == MIDDLEKEYCODE){
-			svg.select("path#id1").attr("stroke", "blue");
-		}
-		if (key == RIGHTKEYCODE){
-			svg.select("path#id2").attr("stroke", "blue");
-		}
-		});
-	
+        tickColors = ["#444445", "#747475", "#adadae", "#e4e4e4", "#e4e4e4"];
+        //padding= circleRadius*3;
+        d3.select("#selector")
+                .on("change", updateSelector)
+                .selectAll("option.auto")
+                .data(plist).enter()
+                .append("option")
+                .attr("value", function(d) { return d; })
+                .text(function(d) { return pname[d]; });
+                
+        wrangle();
+        draw();
+        d3.select(window).on("keyup", function(){
+                        svg.select("path#id0").attr("stroke", "black");
+                        svg.select("path#id1").attr("stroke", "black");
+                        svg.select("path#id2").attr("stroke", "black");
+                });
+                                        
+        registerKeyboardHandler(function(){
+                var key = d3.event.keyCode;
+        
+                if (key == LEFTKEYCODE){
+                        svg.select("path#id0").attr("stroke", "blue");
+                }
+                if (key == MIDDLEKEYCODE){
+                        svg.select("path#id1").attr("stroke", "blue");
+                }
+                if (key == RIGHTKEYCODE){
+                        svg.select("path#id2").attr("stroke", "blue");
+                }
+                });
+        
 //disable highlighting
 
 }
 
 function draw(){
-	drawAxes();
-	drawTicks(0);
-	drawTicks(1);
-	drawTicks(2);
-	if (numAxes > 2){
-		drawLine();
-		drawPointers();
-		//drawDragPoints();
-	}
-	constructValidPoints();
-	drawInputs();
+        drawAxes();
+        drawTicks(0);
+        drawTicks(1);
+        drawTicks(2);
+        if (numAxes > 2){
+                drawLine();
+                drawPointers();
+                //drawDragPoints();
+        }
+        constructValidPoints();
+        drawInputs();
 }
 var closestCurrentPoints=[5, 5, 5];
 
@@ -201,58 +202,58 @@ var closestCurrentPoints=[5, 5, 5];
 
 
 function drawInputs(){
-	
-	//MAKE THE LABELS FOR CURRENT LINE VALS 
-	updateLineEquation();
-	//console.log("calling from drawinputs");
-	findIntersection(true);
-	var myClass = "axisControl";
-	svg.selectAll("."+myClass).remove();
-	svg.selectAll("."+myClass)
-		.data(data)
-		.enter()
-		.append("text")
-		.attr("class", myClass)
-		.attr("text-anchor", function(d, i){
-			if (i == 0){
-				return "start";
-			}
-			else return "end";
-		})
+        
+        //MAKE THE LABELS FOR CURRENT LINE VALS 
+        updateLineEquation();
+        //console.log("calling from drawinputs");
+        findIntersection(true, MIDDLE );
+        var myClass = "axisControl";
+        svg.selectAll("."+myClass).remove();
+        svg.selectAll("."+myClass)
+                .data(data)
+                .enter()
+                .append("text")
+                .attr("class", myClass)
+                .attr("text-anchor", function(d, i){
+                        if (i == 0){
+                                return "start";
+                        }
+                        else return "end";
+                })
 
-		//change alignment
-		.attr("x", function(d, i){
-			if (i == 0){	return parseInt(line.attr("x1")) - polyWidth;}
-			else if (i == 1 && intersection != undefined ){ return xScale(intersection.x)}
-			else if (i == 2){ return parseInt(line.attr("x2")) + polyWidth;}
-			
-		})
-		.attr("y", function(d, i){
-			if (i == 0){ return	parseInt(line.attr("y1")) - (polyHeight/2);}
-			else if (i == 1 && intersection != undefined ){return h - yScale(intersection.y);}
-			else { return parseInt(line.attr("y2")) -  (polyHeight/2);}
-		})
-			//X SHOULD BE THE CURRENT POINT ON THIS AXIS
+                //change alignment
+                .attr("x", function(d, i){
+                        if (i == 0){        return parseInt(line.attr("x1")) - polyWidth;}
+                        else if (i == 1 && intersection != undefined ){ return xScale(intersection.x)}
+                        else if (i == 2){ return parseInt(line.attr("x2")) + polyWidth;}
+                        
+                })
+                .attr("y", function(d, i){
+                        if (i == 0){ return        parseInt(line.attr("y1")) - (polyHeight/2);}
+                        else if (i == 1 && intersection != undefined ){return h - yScale(intersection.y);}
+                        else { return parseInt(line.attr("y2")) -  (polyHeight/2);}
+                })
+                        //X SHOULD BE THE CURRENT POINT ON THIS AXIS
 
-		.text(function(d, i){
-			if (i == 0) {
-				return closestCurrentPoints[0].toFixed(2);
-				}
-			else if (i == 1 && intersection != undefined ){
-				return intersection.u.toFixed(2);
-			}
-			else if (i == 1 && intersection == undefined){
-				return "";
-			}
-			else return closestCurrentPoints[2].toFixed(2);
-			})
+                .text(function(d, i){
+                        if (i == 0) {
+                                return closestCurrentPoints[0].toFixed(2);
+                                }
+                        else if (i == 1 && intersection != undefined ){
+                                return intersection.u.toFixed(2);
+                        }
+                        else if (i == 1 && intersection == undefined){
+                                return "";
+                        }
+                        else return closestCurrentPoints[2].toFixed(2);
+                        })
 }
 
 /**
-		
-	})	
-	.attr("y",function(d) {
-		return h - padding/2;  //line up all axes
+                
+        })        
+        .attr("y",function(d) {
+                return h - padding/2;  //line up all axes
 })
 */
 
@@ -260,245 +261,247 @@ var xScale;
 var line;
 var circleRadius = 15;
 function drawLine(){
-	if (numAxes < 3){
-		return;
-	}
-	
+        if (numAxes < 3){
+                return;
+        }
+        
 
-	
-	line = svg.append("line")
-		.attr("id", "nomoline")
-		.attr("stroke-width", 5)
-		.attr("x1", xScale ( 
-			data[0].points.filter(function(d, i){
-				return d3.min(data[0].points, 
-						function(e) { return e.y; }) //a number
-							== d.y;
-							})[0].x
-						)
-					)
-			
-			
-			
-			
-			
-		.attr("y1", yScale(d3.min(data[0].points, function(e) { return e.y; })))//want highest
+        
+        line = svg.append("line")
+                .attr("id", "nomoline")
+                .attr("stroke-width", 5)
+                .attr("x1", xScale ( 
+                        data[0].points.filter(function(d, i){
+                                return d3.min(data[0].points, 
+                                                function(e) { return e.y; }) //a number
+                                                        == d.y;
+                                                        })[0].x
+                                                )
+                                        )
+                        
+                        
+                        
+                        
+                        
+                .attr("y1", yScale(d3.min(data[0].points, function(e) { return e.y; })))//want highest
 
-		
-		.attr("x2", xScale ( 
-			data[2].points.filter(function(d, i){
-				return d3.min(data[2].points, 
-						function(e) { return e.y; }) //a number
-							== d.y;
-							})[0].x
-						)
-					)
-		.attr("y2", yScale(d3.min(data[2].points, function(e) { return e.y; })));//want min Y, highest*/ 
-	
-	//initialize closest point labels
-	currentCircle = 0;
-	var leftCoords = [line.attr("x1"), line.attr("y1")];
-	//console.log("calling from left side to find closest point");
-	closestCurrentPoints[0]=closestPoint(leftCoords)[2];
-	currentCircle = 1;
-	//console.log("calling from right side to find closest point");
-	var rightCoords = [line.attr("x2"), line.attr("y2")];
-	closestCurrentPoints[2]=closestPoint(rightCoords)[2];
+                
+                .attr("x2", xScale ( 
+                        data[2].points.filter(function(d, i){
+                                return d3.min(data[2].points, 
+                                                function(e) { return e.y; }) //a number
+                                                        == d.y;
+                                                        })[0].x
+                                                )
+                                        )
+                .attr("y2", yScale(d3.min(data[2].points, function(e) { return e.y; })));//want min Y, highest*/ 
+        
+        //initialize closest point labels
+        currentCircle = 0;
+        var leftCoords = [line.attr("x1"), line.attr("y1")];
+        //console.log("calling from left side to find closest point");
+        closestCurrentPoints[0]=closestPoint(leftCoords)[2];
+        currentCircle = 2;
+        //console.log("calling from right side to find closest point");
+        var rightCoords = [line.attr("x2"), line.attr("y2")];
+        closestCurrentPoints[2]=closestPoint(rightCoords)[2];
 }
 function drawDragPoints(){
 
-	d3.selectAll("circle").remove();
-	svg.selectAll("circle")
-	//
-		.data(data.filter(function(d, i) { return i != 1 ; }))
-		.enter()
-		.append("circle")
-		.attr("cx", function(d, i){
-			if (i == 0){ return line.attr("x1");}
-			else return line.attr("x2");
-			})
-		.attr("cy", function(d, i){
-			if (i == 0){ return line.attr("y1");}
-			else return line.attr("y2");
-			})
-		.attr("r", circleRadius)
-		.attr("class", "dragpoint")
-		.on("mousedown", function(d, i){clickCircle(i, this)})
-		//.on("mouseup", mouseup);
-	svg.on("mouseup", mouseup);
-		
-		
+        d3.selectAll("circle").remove();
+        svg.selectAll("circle")
+        //
+                .data(data.filter(function(d, i) { return i != 1 ; }))
+                .enter()
+                .append("circle")
+                .attr("cx", function(d, i){
+                        if (i == 0){ return line.attr("x1");}
+                        else return line.attr("x2");
+                        })
+                .attr("cy", function(d, i){
+                        if (i == 0){ return line.attr("y1");}
+                        else return line.attr("y2");
+                        })
+                .attr("r", circleRadius)
+                .attr("class", "dragpoint")
+                .on("mousedown", function(d, i){clickCircle(i, this)})
+                //.on("mouseup", mouseup);
+        svg.on("mouseup", mouseup);
+                
+                
 }
 
 var dirty=false;
 
 var currentCircle;
 function clickCircle(i, clickevent){
-	currentCircle = i;
-	
-	svg.on("mousemove", mousemove);
+        currentCircle = i;
+        if (i == 1){
+			currentCircle = 2;
+		}
+        svg.on("mousemove", mousemove);
 }
 function moveCircle(i){
-/**	console.log(d3.mouse(this));
-	if (i == 0){
-		line.attr("x1", m[0]);
-		line.attr("y1", m[1]);
-	}
-	else if (i == 1){
-		line.attr("x2", m[0]);
-		line.attr("y2", m[1]);
-		
-	}*/
+/**        console.log(d3.mouse(this));
+        if (i == 0){
+                line.attr("x1", m[0]);
+                line.attr("y1", m[1]);
+        }
+        else if (i == 1){
+                line.attr("x2", m[0]);
+                line.attr("y2", m[1]);
+                
+        }*/
 }
 
 var textDistance = [1.0, 1.0/4, 1.0/4, 1.0/4, 1.0/4];
 var halfEx = 6;
 
 function labelTransform(level, x, y, dx, dy) {
-	var dist = textDistance[level];
-	if (dy < 0) {
-		// flip
-		dx = -dx;
-		dy = -dy;
-		dist = -dist;
-	}
-	var tx = x + dist * dy;
-	var ty = y - dist * dx;
-	var e = xScale(tx) - halfEx * dx;
-	var f = h - yScale(ty) + halfEx * dy;
-	var a = dy;
-	var b = dx;
-	var c = -dx;
-	var d = dy;
-	return 'matrix(' + [a, b, c, d, e, f] + ')';
+        var dist = textDistance[level];
+        if (dy < 0) {
+                // flip
+                dx = -dx;
+                dy = -dy;
+                dist = -dist;
+        }
+        var tx = x + dist * dy;
+        var ty = y - dist * dx;
+        var e = xScale(tx) - halfEx * dx;
+        var f = h - yScale(ty) + halfEx * dy;
+        var a = dy;
+        var b = dx;
+        var c = -dx;
+        var d = dy;
+        return 'matrix(' + [a, b, c, d, e, f] + ')';
 }
 
 function labelAnchor(dy) {
-	return dy < 0 ? 'end' : 'start';
+        return dy < 0 ? 'end' : 'start';
 }
 
 var tickLength = [3.0/4, 0.9/4, 0.5/4, 0.3/4, 0.2/4];
 var tickColors =[];
 function drawTicks(level){
 
-	var myClass;
-	for (var axis = 0; axis < numAxes; axis ++){
-		myClass = "axis"+axis+"-level"+level;
-		svg.selectAll("."+"myClass")
-			.data(data[axis].ticks[level])
-			.enter()
-			.append("line")
-			.attr("stroke", tickColors[level])
-			.attr("stroke-width", 2)
-			.attr("fill", "none")
-			.attr("class", myClass)
-			.attr("x1", function (d)
-				{return xScale	(d.x) })
-			.attr("y1", function(d){return h - yScale(d.y)})
-			.attr("x2", function(d)	{return xScale((d.x + (tickLength[level]*d.dy)))})
-			.attr("y2", function(d){return h - yScale((d.y - (tickLength[level]*d.dx)))})
-			}
+        var myClass;
+        for (var axis = 0; axis < numAxes; axis ++){
+                myClass = "axis"+axis+"-level"+level;
+                svg.selectAll("."+"myClass")
+                        .data(data[axis].ticks[level])
+                        .enter()
+                        .append("line")
+                        .attr("stroke", tickColors[level])
+                        .attr("stroke-width", 2)
+                        .attr("fill", "none")
+                        .attr("class", myClass)
+                        .attr("x1", function (d)
+                                {return xScale        (d.x) })
+                        .attr("y1", function(d){return h - yScale(d.y)})
+                        .attr("x2", function(d)        {return xScale((d.x + (tickLength[level]*d.dy)))})
+                        .attr("y2", function(d){return h - yScale((d.y - (tickLength[level]*d.dx)))})
+                        }
 
-	if (level == 0) {
-			for (var axis = 0; axis < numAxes; axis ++){
-				myClass = "label-"+"axis"+axis+"-level"+level;
-				svg.selectAll("."+"myClass")
-					.data(data[axis].ticks[level])
-					.enter()
-					.append("text")
-					//.attr("stroke", tickColors[level])
-					//.attr("stroke-width", 2)
-					//.attr("fill", "none")
-					.attr("class", myClass)
-					.attr("transform", function (d) { return labelTransform(level, d.x, d.y, d.dx, d.dy); })
-					.attr("text-anchor", function (d) { return labelAnchor(d.dy); })
-					.text(function(d) { 
-						if (d.u.toFixed(0) == d.u.toFixed(2)){return d.u.toFixed(0);}
-						else return d.u.toFixed(2) })
-					//.attr("x2", function(d)	{return xScale((d.x + (tickLength[level]*d.dy)))})
-					//.attr("y2", function(d){return h - yScale((d.y - (tickLength[level]*d.dx)))})
-					}
-	}
-			
-			
-			
-		
+        if (level == 0) {
+                        for (var axis = 0; axis < numAxes; axis ++){
+                                myClass = "label-"+"axis"+axis+"-level"+level;
+                                svg.selectAll("."+"myClass")
+                                        .data(data[axis].ticks[level])
+                                        .enter()
+                                        .append("text")
+                                        //.attr("stroke", tickColors[level])
+                                        //.attr("stroke-width", 2)
+                                        //.attr("fill", "none")
+                                        .attr("class", myClass)
+                                        .attr("transform", function (d) { return labelTransform(level, d.x, d.y, d.dx, d.dy); })
+                                        .attr("text-anchor", function (d) { return labelAnchor(d.dy); })
+                                        .text(function(d) { 
+                                                if (d.u.toFixed(0) == d.u.toFixed(2)){return d.u.toFixed(0);}
+                                                else return d.u.toFixed(2) })
+                                        //.attr("x2", function(d)        {return xScale((d.x + (tickLength[level]*d.dy)))})
+                                        //.attr("y2", function(d){return h - yScale((d.y - (tickLength[level]*d.dx)))})
+                                        }
+        }
+                        
+                        
+                        
+                
 }
 
 function drawAxes(){
-	svg = d3.select("svg").remove();
-	//SVG container
+        svg = d3.select("svg").remove();
+        //SVG container
 
-	//CHANGE TO RESTFUL WAY
+        //CHANGE TO RESTFUL WAY
 
-	//replace with num axes
-	//MAKE THE AXES
-	var maxX=0;
-	var maxY=0;
-	var currentMaxX=0;
-	var currentMaxY=0;
-	var minX = 1000;
-	var minY = 1000;
-	var currentMinX = 1000;
-	var currentMinY = 1000;
-	for (var k = 0; k < numAxes; k++){
-			currentMaxY = d3.max(data[k].points, function(d) { return d.y; });
-			currentMaxX = d3.max(data[k].points, function(d) { return d.x; });
-			currentMinY = d3.min(data[k].points, function(d) { return d.y; });
-			currentMinX = d3.min(data[k].points, function(d) { return d.x; });
-			if (currentMaxY > maxY){maxY = currentMaxY;}
-			if (currentMaxX > maxX){maxX = currentMaxX;	}
-			if (currentMinY < minY){minY = currentMinY;}
-			if (currentMinX < minX){minX = currentMinX;	}
-		}
-	
-	var xRatio = (maxX - minX)/(w- 2*padding- 2*polyWidth);
-	h= (maxY-minY)/xRatio + 2*padding;
-	xScale = d3.scale.linear()
-		.domain([minX, maxX])
-		.range([0+padding+polyWidth, w-padding-polyWidth]);
-	yScale = d3.scale.linear()
-		.domain([minY, maxY])
-		.range([0+padding, h - padding]);
-	//console.log("h is initialized to: " + h);
-	//now that we know width, make SVG
-	svg = d3.select("body").append("svg")
-	//TODO FIND OUT WHY THIS IS WEIRD
-		.attr("width", w+ (polyWidth*2) + 50)
-		.attr("height", h+ labelHeight);
-		
-	var lineFunction = d3.svg.line()
-			.x(function(d) {return xScale(d.x) ; })
-			.y(function(d) {return h - yScale(d.y) ; })
-			.interpolate("linear");
-		//console.log("in here");
-		//The line SVG Path we draw
-	for (var i = 0; i < numAxes; i++){
-		//DRAW AXES
-		var lineGraph = svg.append("path")
-			.attr("d", lineFunction(data[i].points))
-			.attr("stroke", "black")
-			.attr("stroke-width", 2)
-			.attr("id", "id"+ i)
-			.attr("fill", "none")
-			.attr("class", "axis");
-		//LABEL THE AXES
-		svg.selectAll("text")
-			.data(data)
-			.enter()
-			.append("text")
-			.text(function(d) {
-				return d.name;
-			})
-			.attr("x", function(d){
-				return xScale(d3.mean(d.points, function(e) { return e.x; }));
-			})	
-			.attr("y",function(d) {
-				return h - padding/2;  //line up all axes
-		})
+        //replace with num axes
+        //MAKE THE AXES
+        var maxX=0;
+        var maxY=0;
+        var currentMaxX=0;
+        var currentMaxY=0;
+        var minX = 1000;
+        var minY = 1000;
+        var currentMinX = 1000;
+        var currentMinY = 1000;
+        for (var k = 0; k < numAxes; k++){
+                        currentMaxY = d3.max(data[k].points, function(d) { return d.y; });
+                        currentMaxX = d3.max(data[k].points, function(d) { return d.x; });
+                        currentMinY = d3.min(data[k].points, function(d) { return d.y; });
+                        currentMinX = d3.min(data[k].points, function(d) { return d.x; });
+                        if (currentMaxY > maxY){maxY = currentMaxY;}
+                        if (currentMaxX > maxX){maxX = currentMaxX;        }
+                        if (currentMinY < minY){minY = currentMinY;}
+                        if (currentMinX < minX){minX = currentMinX;        }
+                }
+        
+        var xRatio = (maxX - minX)/(w- 2*padding- 2*polyWidth);
+        h= (maxY-minY)/xRatio + 2*padding;
+        xScale = d3.scale.linear()
+                .domain([minX, maxX])
+                .range([0+padding+polyWidth, w-padding-polyWidth]);
+        yScale = d3.scale.linear()
+                .domain([minY, maxY])
+                .range([0+padding, h - padding]);
+        //console.log("h is initialized to: " + h);
+        //now that we know width, make SVG
+        svg = d3.select("body").append("svg")
+        //TODO FIND OUT WHY THIS IS WEIRD
+                .attr("width", w+ (polyWidth*2) + 50)
+                .attr("height", h+ labelHeight);
+                
+        var lineFunction = d3.svg.line()
+                        .x(function(d) {return xScale(d.x) ; })
+                        .y(function(d) {return h - yScale(d.y) ; })
+                        .interpolate("linear");
+                //console.log("in here");
+                //The line SVG Path we draw
+        for (var i = 0; i < numAxes; i++){
+                //DRAW AXES
+                var lineGraph = svg.append("path")
+                        .attr("d", lineFunction(data[i].points))
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("id", "id"+ i)
+                        .attr("fill", "none")
+                        .attr("class", "axis");
+                //LABEL THE AXES
+                svg.selectAll("text")
+                        .data(data)
+                        .enter()
+                        .append("text")
+                        .text(function(d) {
+                                return d.name;
+                        })
+                        .attr("x", function(d){
+                                return xScale(d3.mean(d.points, function(e) { return e.x; }));
+                        })        
+                        .attr("y",function(d) {
+                                return h - padding/2;  //line up all axes
+                })
 
-	
-	
+        
+        
 }
 }
 var tickWidth = 1; 
@@ -508,279 +511,291 @@ var granularity = 2;
 
 function mousedown() {
     var m = d3.mouse(this);
-	//console.log("moused down: ");
+        //console.log("moused down: ");
     //svg.on("mousemove", mousemove);
 }
 
 function getY(s){
-	return s.split(',')[1].split(')')[0];
+        return s.split(',')[1].split(')')[0];
 }
 
 function mousemove() {
-	
-	dirty=true;
-	var m = d3.mouse(this);
+        
+        dirty=true;
+        var m = d3.mouse(this);
 
     var closestPointReturn;
-		var currentX;
-		var currentY;
-		var prevM = m;
-		var prevB = b;
-	
-		//find closest point
-		closestPointReturn = closestPoint(m)
+                var currentX;
+                var currentY;
+                var prevM = m;
+                var prevB = b;
+        
+                //find closest point
+                closestPointReturn = closestPoint(m)
 
 
-		//console.log("CURRENT CIRCLE IS: "+ currentCircle);
-		d3.selectAll("polygon")
-			.filter(function (d, i){ return i ==currentCircle;})
-			.attr("points",function(d, i) { 
-				var pts = [];
-				currentX = closestPointReturn[0];
-				currentY = closestPointReturn[1];
-				
-				
-				
-				//retreive polygon origin 
-				if (currentCircle == 0){
-					
+                //console.log("CURRENT CIRCLE IS: "+ currentCircle);
+                d3.selectAll("polygon")
+                        .filter(function (d, i){ 
+							//TODO: FIX WHEN 3 POLYS
+							if (currentCircle == RIGHT){
+								return i == 1;
+							}
+							else return (i == currentCircle);})
 						
-					//NEW LINE
-				
-					
-					startX =  closestPointReturn[0];
-					startY = closestPointReturn[1];
-					line.attr("x1", closestPointReturn[0]);
-					line.attr("y1", closestPointReturn[1]);
-
-					//console.log("aaaaaaaaa");
-					pts = [startX, startY, 
-							startX-(polyWidth/4), startY - (polyHeight/2), 
-							startX - polyWidth, startY - (polyHeight/2),
-							startX - polyWidth, startY + (polyHeight/2),
-							startX - (polyWidth/4), startY + (polyHeight/2)
-									];		
-				}
-				else {
-					//console.log("AAAAAAAAAAAAAA");
-							startX =  closestPointReturn[0];
-							startY = closestPointReturn[1];
-							line.attr("x2", closestPointReturn[0]);
-							line.attr("y2", closestPointReturn[1]);
-					pts = [startX, startY, 
-							startX+(polyWidth/4), startY - (polyHeight/2), 
-							startX + polyWidth, startY - (polyHeight/2),
-							startX + polyWidth, startY + (polyHeight/2),
-							startX + (polyWidth/4), startY + (polyHeight/2)
-									];
-				}
-				
-				return pts.join(",");
-			})
-			
-		
-		drawInputs();
+                        .attr("points",function(d, i) { 
+                                var pts = [];
+                                currentX = closestPointReturn[0];
+                                currentY = closestPointReturn[1];
+                                
+                                
+                                
+                                //retreive polygon origin 
+                                if (currentCircle == LEFT){
+                                        console.log("LEFT");
+                                                
+                                        //NEW LINE
+                                
+                                        
+                                        startX =  closestPointReturn[0];
+                                        startY = closestPointReturn[1];
+                                        line.attr("x1", closestPointReturn[0]);
+                                        line.attr("y1", closestPointReturn[1]);
+										intersections[LEFT] = {x:closestPointReturn[0], y:closestPointReturn[1]};
+                                        //console.log("aaaaaaaaa");
+                                        pts = [startX, startY, 
+                                                        startX-(polyWidth/4), startY - (polyHeight/2), 
+                                                        startX - polyWidth, startY - (polyHeight/2),
+                                                        startX - polyWidth, startY + (polyHeight/2),
+                                                        startX - (polyWidth/4), startY + (polyHeight/2)
+                                                                        ];                
+                                }
+                                else if (currentCircle == RIGHT) {
+										console.log("RIGHt");
+                                        //console.log("AAAAAAAAAAAAAA");
+                                                        startX =  closestPointReturn[0];
+                                                        startY = closestPointReturn[1];
+                                                        line.attr("x2", closestPointReturn[0]);
+                                                        line.attr("y2", closestPointReturn[1]);
+														intersections[RIGHT] = {x:closestPointReturn[0], y:closestPointReturn[1]};
+                                        pts = [startX, startY, 
+                                                        startX+(polyWidth/4), startY - (polyHeight/2), 
+                                                        startX + polyWidth, startY - (polyHeight/2),
+                                                        startX + polyWidth, startY + (polyHeight/2),
+                                                        startX + (polyWidth/4), startY + (polyHeight/2)
+                                                                        ];
+                                }
+                                
+                                return pts.join(",");
+                        })
+                        
+                
+                drawInputs();
 
 }
 
 
 function mouseup() {
-	if (dirty){
-		dirty=false;
-	 	constructValidPoints();
-	}
-	 svg.on("mousemove", null);
-//	var closest = closestTick(this);
-	//line.attr("y1", closest[1]); 	//change position to closest position
-//	circle1.attr("cy", closest[1]);
+        if (dirty){
+                dirty=false;
+                 constructValidPoints();
+        }
+         svg.on("mousemove", null);
+//        var closest = closestTick(this);
+        //line.attr("y1", closest[1]);         //change position to closest position
+//        circle1.attr("cy", closest[1]);
    
-//	var g = d3.selectAll("g .tick")
-///	d3.selectAll("g .tick").style("fill", "black");
-//	d3.select(g[0][closestTick(this)[0]]).style("fill", highlight);
+//        var g = d3.selectAll("g .tick")
+///        d3.selectAll("g .tick").style("fill", "black");
+//        d3.select(g[0][closestTick(this)[0]]).style("fill", highlight);
 }
 
 
 //returns a list 0 is tick object, 1 is y coordinate of tick
 function closestTick(event){
-	var m = d3.mouse(event);
-	var ticks = d3.selectAll("g .tick")[0];
-	var currentDistance, minDistance, currentTickIndex, closestTickIndex, currentY, destinationY;
-	minDistance = 100000;
-	for (var i=0;i<numTicks;i++){
-		
-		currentTickIndex = i;
-		currentTick = ticks[i].getAttribute("transform");
-		currentY = getY(currentTick);
-		currentDistance = Math.abs(currentY - m[1]);
-		
-		//find closest tick to current y position
-		if (currentDistance < minDistance){
-			minDistance = currentDistance;
-			destinationY = currentY;
-			closestTickIndex= i;
-			
-			}
-	}
-	return [closestTickIndex, destinationY];    
+        var m = d3.mouse(event);
+        var ticks = d3.selectAll("g .tick")[0];
+        var currentDistance, minDistance, currentTickIndex, closestTickIndex, currentY, destinationY;
+        minDistance = 100000;
+        for (var i=0;i<numTicks;i++){
+                
+                currentTickIndex = i;
+                currentTick = ticks[i].getAttribute("transform");
+                currentY = getY(currentTick);
+                currentDistance = Math.abs(currentY - m[1]);
+                
+                //find closest tick to current y position
+                if (currentDistance < minDistance){
+                        minDistance = currentDistance;
+                        destinationY = currentY;
+                        closestTickIndex= i;
+                        
+                        }
+        }
+        return [closestTickIndex, destinationY];    
 }
-var RIGHT = 1;
+
+function hasIntersection(checkX, checkY){        
+        if (currentCircle == RIGHT){
+                //RIGHT AXIS
+                updateTempLineEquation(parseInt(line.attr("x1")), parseInt(line.attr("y1")), checkX, checkY); 
+                //console.log("calling from hasIntersection on right");
+                if (findIntersection(false, MIDDLE)== undefined){
+                        //console.log("no intersection");
+                        return false
+                }
+                else return true;
+        }
+        else if (currentCircle == LEFT){
+                //LEFT AXIS                
+                updateTempLineEquation(checkX, checkY, parseInt(line.attr("x2")), parseInt(line.attr("y2")));
+                if (findIntersection(false, MIDDLE)== undefined){
+                        return false
+                }
+                else{
+                
+                        return true;
+                }         
+        }
+        else {
+                console.log("neither circle");
+                return true;
+        }        
+}
+
+
+var intersections=[];
+
 var LEFT = 0;
-function hasIntersection(checkX, checkY){	
-	if (currentCircle == RIGHT){
-		//RIGHT AXIS
-		updateTempLineEquation(parseInt(line.attr("x1")), parseInt(line.attr("y1")), checkX, checkY); 
-		//console.log("calling from hasIntersection on right");
-		if (findIntersection(false)== undefined){
-			//console.log("no intersection");
-			return false
-		}
-		else return true;
-	}
-	else if (currentCircle == LEFT){
-		//LEFT AXIS		
-		updateTempLineEquation(checkX, checkY, parseInt(line.attr("x2")), parseInt(line.attr("y2")));
-		if (findIntersection(false)== undefined){
-			return false
-		}
-		else{
-		
-			return true;
-		} 	
-	}
-	else {
-		console.log("neither circle");
-		return true;
-	}	
-}
-
-
+var MIDDLE = 1;
+var RIGHT = 2;
 
 function closestPoint(m){
-	var dataIndex = 0;
-	if (currentCircle == 1){
-		dataIndex=2;
-	}
-	else if (currentCircle == 2){
-		dataIndex = 1;
-	}
-	
-	
-	var minSqDistance, closestXScaled, closestYScaled, closestPointValue;
-	minSqDistance = 1e10;
-	var axisPoints = data[dataIndex].points;
-	var numPoints = axisPoints.length;
-	var mx = xScale.invert(m[0]);
-	var my = yScale.invert(h - m[1]);
-	var destXRaw, destYRaw;
-	//iterate to find closest point in new scheme
-	for (var i=0;i<numPoints;i++){
-	
-		var point = axisPoints[i];
-		var px = point.x;
-		var py = point.y;
-		var currentSqDistance = (mx - px) * (mx - px) + (my - py) * (my - py);
-		if (i == 0){
-					//INITIALIZE
-				closestXScaled = xScale(px);
-				closestYScaled = yScale(py);
-				closestPointValue=point.u;
-		}
-		//find closest tick to current y position
-
-		if (currentSqDistance < minSqDistance){
-			destXRaw = px;
-			destYRaw = py;
-			var xScaled = xScale(destXRaw);
-			var yScaled = h - yScale(destYRaw);
-			var isValid;
-			//ITERATING THE LEFT SIDE
-			if (dataIndex == 0){
-				isValid = validPointsLeft[i];
-			}
-			//ITERATING RIGHT SIDE 
-			else if (dataIndex == 2){
-				isValid = validPointsRight[i];
-			}
-			if (isValid){
-					var currentPointValue = point.u;
-					closestPointValue = currentPointValue;
-					minSqDistance = currentSqDistance;
-					closestXScaled = xScaled;
-					closestYScaled = yScaled;
-			}
 		
-			
+        var dataIndex = 0;
+        if (currentCircle == 1){
+                dataIndex=1;
+        }
+        else if (currentCircle == 2){
+                dataIndex = 2;
+        }
+        
+        var minSqDistance, closestXScaled, closestYScaled, closestPointValue;
+        minSqDistance = 1e10;
+        var axisPoints = data[dataIndex].points;
+        var numPoints = axisPoints.length;
+        var mx = xScale.invert(m[0]);
+        var my = yScale.invert(h - m[1]);
+        var destXRaw, destYRaw;
+        //iterate to find closest point in new scheme
+        for (var i=0;i<numPoints;i++){
+        
+                var point = axisPoints[i];
+                var px = point.x;
+                var py = point.y;
+                var currentSqDistance = (mx - px) * (mx - px) + (my - py) * (my - py);
+                if (i == 0){
+                                        //INITIALIZE
+                                closestXScaled = xScale(px);
+                                closestYScaled = yScale(py);
+                                closestPointValue=point.u;
+                }
+                //find closest tick to current y position
 
-		}
-	}
-	closestCurrentPoints[dataIndex]=closestPointValue;
+                if (currentSqDistance < minSqDistance){
+                        destXRaw = px;
+                        destYRaw = py;
+                        var xScaled = xScale(destXRaw);
+                        var yScaled = h - yScale(destYRaw);
+                        var isValid;
+                        //ITERATING THE LEFT SIDE
+                        if (dataIndex == 0){
+                                isValid = validPointsLeft[i];
+                        }
+                        //ITERATING RIGHT SIDE 
+                        else if (dataIndex == 2){
+                                isValid = validPointsRight[i];
+                        }
+                        if (isValid){
+                                        var currentPointValue = point.u;
+                                        closestPointValue = currentPointValue;
+                                        minSqDistance = currentSqDistance;
+                                        closestXScaled = xScaled;
+                                        closestYScaled = yScaled;
+                        }
+                
+                        
 
-	return [closestXScaled, closestYScaled, closestPointValue];
+                }
+        }
+        closestCurrentPoints[dataIndex]=closestPointValue;
+
+        return [closestXScaled, closestYScaled, closestPointValue];
 }
 
 
 function drawPointers(){
-	//var polyWidth = 100;
-	//var polyHeight=50;
-	//var startX;
-	//var startY;
-	
-	svg.selectAll("polygon")
-	    .data(data.filter(function(d, i) { return i != 1 ; }))
-	  	.enter().append("polygon")
-	    .attr("points",function(d, i) { 
-			var pts = [];
-			//retreive polygon origin 
-			if (i == 0){
-				startX = parseInt(line.attr("x1"));
-				startY = parseInt(line.attr("y1"));
-				
-				pts = [startX, startY, 
-						startX-(polyWidth/4), startY - (polyHeight/2), 
-						startX - polyWidth, startY - (polyHeight/2),
-						startX - polyWidth, startY + (polyHeight/2),
-						startX - (polyWidth/4), startY + (polyHeight/2)
-								];		
-			}
-			else {
-				startX = parseInt(line.attr("x2"));
-				startY = parseInt(line.attr("y2"));
-				pts = [startX, startY, 
-						startX+(polyWidth/4), startY - (polyHeight/2), 
-						startX + polyWidth, startY - (polyHeight/2),
-						startX + polyWidth, startY + (polyHeight/2),
-						startX + (polyWidth/4), startY + (polyHeight/2)
-								];
-			}
+        //var polyWidth = 100;
+        //var polyHeight=50;
+        //var startX;
+        //var startY;
+        
+        svg.selectAll("polygon")
+            .data(data.filter(function(d, i) { return i != 1 ; }))
+                  .enter().append("polygon")
+            .attr("points",function(d, i) { 
+                        var pts = [];
+                        //retreive polygon origin 
+                        if (i == 0){
+                                startX = parseInt(line.attr("x1"));
+                                startY = parseInt(line.attr("y1"));
+                                
+                                pts = [startX, startY, 
+                                                startX-(polyWidth/4), startY - (polyHeight/2), 
+                                                startX - polyWidth, startY - (polyHeight/2),
+                                                startX - polyWidth, startY + (polyHeight/2),
+                                                startX - (polyWidth/4), startY + (polyHeight/2)
+                                                                ];                
+                        }
+                        else {
+                                startX = parseInt(line.attr("x2"));
+                                startY = parseInt(line.attr("y2"));
+                                pts = [startX, startY, 
+                                                startX+(polyWidth/4), startY - (polyHeight/2), 
+                                                startX + polyWidth, startY - (polyHeight/2),
+                                                startX + polyWidth, startY + (polyHeight/2),
+                                                startX + (polyWidth/4), startY + (polyHeight/2)
+                                                                ];
+                        }
 
-			return pts.join(",");
-		})
-					
-	    .attr("fill","blue")
-	    .attr("stroke-width",2)
-		.attr("class", "dragpoint")
-		.on("mousedown", function(d, i){clickCircle(i, this)})
-		.on("mouseup", mouseup);
-		svg.on("mouseup", mouseup);
-	}
+                        return pts.join(",");
+                })
+                                        
+            .attr("fill","blue")
+            .attr("stroke-width",2)
+                .attr("class", "dragpoint")
+                .on("mousedown", function(d, i){clickCircle(i, this)})
+                .on("mouseup", mouseup);
+                svg.on("mouseup", mouseup);
+        }
 
 
 function updateSelector(){
-	d = this.value;
-	wrangle(d);
-	
-	draw();
+        d = this.value;
+        wrangle(d);
+        
+        draw();
 
 }
 
 function drawNomo(){
-	
-		document.getElementById('domain1').value = domain[0];
-		document.getElementById('domain2').value = domain[1];
-		document.getElementById('ticks1').value = numTicks;
-		
-		
-		highlight =  "#4CB4F5";
+        
+                document.getElementById('domain1').value = domain[0];
+                document.getElementById('domain2').value = domain[1];
+                document.getElementById('ticks1').value = numTicks;
+                
+                
+                highlight =  "#4CB4F5";
 
 
 }
@@ -813,40 +828,37 @@ var validPointsRight=[];
 
 
 
-function constructValidPoints(){	
-	console.log("constructing valid points....");
-	//ITERATE THROUGH POINTS ON LEFT AXIS, RIGHT AXIS STAYS FIXED
-	var axisPoints = data[0].points;
-	var numPoints = axisPoints.length;
-	for (var i=0;i<numPoints;i++){
-		var point = axisPoints[i];
-		var px = point.x;
-		var py = point.y;
-		updateTempLineEquation(xScale(px), h - yScale(py), parseInt(line.attr("x2")), parseInt(line.attr("y2")));
-		if (findIntersection(false)== undefined){
-			validPointsLeft[i]=false;
-		}
-		else {
-			validPointsLeft[i]=true;
-			}
+function constructValidPoints(){        
+        console.log("constructing valid points....");
+        //ITERATE THROUGH POINTS ON LEFT AXIS, RIGHT AXIS STAYS FIXED
+        var axisPoints = data[0].points;
+        var numPoints = axisPoints.length;
+        for (var i=0;i<numPoints;i++){
+                var point = axisPoints[i];
+                var px = point.x;
+                var py = point.y;
+                updateTempLineEquation(xScale(px), h - yScale(py), parseInt(line.attr("x2")), parseInt(line.attr("y2")));
+                if (findIntersection(false, MIDDLE)== undefined){
+                        validPointsLeft[i]=false;
+                }
+                else {
+                        validPointsLeft[i]=true;
+                        }
 
-	}
-	
-	axisPoints = data[2].points;
-	numPoints = axisPoints.length;
-	for (var i=0;i<numPoints;i++){
-		var point = axisPoints[i];
-		var px = point.x;
-		var py = point.y;
-		updateTempLineEquation(parseInt(line.attr("x1")), parseInt(line.attr("y1")), xScale(px), h - yScale(py)); 
-		if (findIntersection(false)== undefined){
-			validPointsRight[i]=false;
-		}
-		else {
-			validPointsRight[i]=true;
-			}
-	}
+        }
+        
+        axisPoints = data[2].points;
+        numPoints = axisPoints.length;
+        for (var i=0;i<numPoints;i++){
+                var point = axisPoints[i];
+                var px = point.x;
+                var py = point.y;
+                updateTempLineEquation(parseInt(line.attr("x1")), parseInt(line.attr("y1")), xScale(px), h - yScale(py)); 
+                if (findIntersection(false, MIDDLE)== undefined){
+                        validPointsRight[i]=false;
+                }
+                else {
+                        validPointsRight[i]=true;
+                        }
+        }
 }
-	
-	
-
