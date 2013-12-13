@@ -18,12 +18,16 @@ line{
 }
 
 .axisControl{
-	
-	fill: #5eb2ec;
-	font-size: 160%;
+	opacity:1;
+
+	stroke:#c0c1c1;
+	background:black;
+	fill: black;
+	font-weight:bold;
+	font-size: 240%;
 }
 polygon {
-	fill: #5eb2ec;
+	fill: #4480d2;
 	z-index:10;
 	opacity:0.6;
 	
@@ -39,7 +43,7 @@ polygon {
 	opacity:.6;
 	 z-index:5;
 	 width: 5px;
-	stroke: #5eb2ec;
+	stroke: #4480d2;
 }
 input{
   width: 30px;
