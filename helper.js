@@ -1,4 +1,4 @@
-var w = 500;
+var w = 600;
 var h = 500;
 var domain =[[0, 5]];
 var numTicks=[10];
@@ -19,9 +19,9 @@ var data;
 var LEFTKEYCODE=49;
 var MIDDLEKEYCODE = 50;
 var RIGHTKEYCODE = 51; 
+var labelPadding = 50;
 
 registerKeyboardHandler = function(callback) {
-        console.log("registering handler");
   var callback = callback;
   d3.select(window).on("keydown", callback);  
 
@@ -267,7 +267,6 @@ var xScale;
 var line;
 var circleRadius = 15;
 function drawLine(){
-	console.log("drawing line...");
         if (numAxes < 3){
                 return;
         }       
@@ -287,7 +286,7 @@ function drawLine(){
                         
                         
                         
-                .attr("y1", yScale(d3.min(data[0].points, function(e) { return e.y; })))//want highest
+                .attr("y1", h - yScale(d3.min(data[0].points, function(e) { return e.y; })))//want highest
 
                 
                 .attr("x2", xScale ( 
@@ -298,7 +297,7 @@ function drawLine(){
                                                         })[0].x
                                                 )
                                         )
-                .attr("y2", yScale(d3.max(data[2].points, function(e) { return e.y; })));//want min Y, highest*/ 
+                .attr("y2", h - yScale(d3.max(data[2].points, function(e) { return e.y; })));//want min Y, highest*/ 
         
         //initialize closest point labels
         currentCircle = 0;
@@ -344,7 +343,6 @@ var dirty=false;
 
 var currentCircle;
 function clickCircle(i, clickevent){
-	console.log("current circle is: " + i);
         currentCircle = i;
         if (i == 1){
 			currentCircle = 2;
@@ -467,13 +465,13 @@ function drawAxes(){
                 }
         
         var xRatio = (maxX - minX)/(w- 2*padding- 2*polyWidth);
-        h= (maxY-minY)/xRatio + 2*padding;
+        h= (maxY-minY)/xRatio + 2*padding+ labelPadding;
         xScale = d3.scale.linear()
                 .domain([minX, maxX])
                 .range([0+padding+polyWidth, w-padding-polyWidth]);
         yScale = d3.scale.linear()
                 .domain([minY, maxY])
-                .range([0+padding, h - padding]);
+                .range([0+padding, h- padding- labelPadding]);
         //console.log("h is initialized to: " + h);
         //now that we know width, make SVG
         svg = d3.select("body").append("svg")
@@ -577,7 +575,7 @@ function mousemove() {
                 //console.log("CURRENT CIRCLE IS: "+ currentCircle);
                 d3.selectAll("polygon")
                         .filter(function (d, i){ 
-							//TODO: FIX WHEN 3 POLYS
+							//TODO: FIX WHEN 3 POLYSR
 							if (currentCircle == RIGHT){
 								return i == 1;
 							}
@@ -610,8 +608,6 @@ function mousemove() {
                                                                         ];                
                                 }
                                 else if (currentCircle == RIGHT) {
-										console.log("RIGHt");
-                                        //console.log("AAAAAAAAAAAAAA");
                                                         startX =  closestPointReturn[0];
                                                         startY = closestPointReturn[1];
                                                         line.attr("x2", closestPointReturn[0]);
@@ -651,7 +647,7 @@ function mousemove() {
 function mouseup() {
         if (dirty){
                 dirty=false;
-                 constructValidPoints();
+                 //constructValidPoints();
         }
          svg.on("mousemove", null);
 //        var closest = closestTick(this);
@@ -763,8 +759,8 @@ function closestPoint(m){
                         var yScaled = h - yScale(destYRaw);
                         var isValid;
                         //ITERATING THE LEFT SIDE
-                        isValid = validPoints[fixed][dataIndex][i];
-                     	//isValid = true;
+                        //isValid = validPoints[fixed][dataIndex][i];
+                     	isValid = true;
                         if (isValid){
                                         var currentPointValue = point.u;
                                         closestPointValue = currentPointValue;
@@ -886,7 +882,6 @@ var validChecks = [
 
 function constructValidPoints(){        
 
-        console.log("constructing valid points....");
 		numAxes = data.length;
 		for (var vci = 0; vci < validChecks.length; vci++) {
 			var movingAxis = validChecks[vci][0];
