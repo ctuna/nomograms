@@ -98,7 +98,7 @@ function updateTempLineEquation(x1, y1, x2, y2){
 var intersection;
 
 
-
+var fakeIntersectionIndex;
 function findIntersection(real, axis){
         	
                 var minDistance = 10000;
@@ -128,13 +128,14 @@ function findIntersection(real, axis){
                 else{
                         //console.log("found an intersection");
                         intersection = closestPoint;
-	                console.log('wh. intersections[%d] set', axis); // %%%
 	                if (real) {
 		                intersections[axis] = {
 			                x: xScale(closestPoint.x),
 			                y: h - yScale(closestPoint.y)
 		                };
 		                isoplethIndices[axis] = minDistIndex;
+	                } else {
+		                fakeIntersectionIndex = minDistIndex;
 	                }
 	                return closestPoint;
                 }
@@ -306,37 +307,36 @@ function initIsopleth() {
 		.attr("y1", y1)
 		.attr("x2", x2)
 		.attr("y2", y2);
-	console.log('wh. intersections left and right set'); // %%%
 	intersections[LEFT] = {x: x1, y: y1};
 	intersections[RIGHT] = {x: x2, y: y2};
 	updateLineEquation();
 	findIntersection(true, MIDDLE);
 }
 
-function drawDragPoints(){
+// function drawDragPoints(){
 
-        d3.selectAll("circle").remove();
-        svg.selectAll("circle")
-        //
-                .data(data.filter(function(d, i) { return i != 1 ; }))
-                .enter()
-                .append("circle")
-                .attr("cx", function(d, i){
-                        if (i == 0){ return line.attr("x1");}
-                        else return line.attr("x2");
-                        })
-                .attr("cy", function(d, i){
-                        if (i == 0){ return line.attr("y1");}
-                        else return line.attr("y2");
-                        })
-                .attr("r", circleRadius)
-                .attr("class", "dragpoint")
-                .on("mousedown", function(d, i){clickCircle(i, this)})
-                //.on("mouseup", mouseup);
-        svg.on("mouseup", mouseup);
+//         d3.selectAll("circle").remove();
+//         svg.selectAll("circle")
+//         //
+//                 .data(data.filter(function(d, i) { return i != 1 ; }))
+//                 .enter()
+//                 .append("circle")
+//                 .attr("cx", function(d, i){
+//                         if (i == 0){ return line.attr("x1");}
+//                         else return line.attr("x2");
+//                         })
+//                 .attr("cy", function(d, i){
+//                         if (i == 0){ return line.attr("y1");}
+//                         else return line.attr("y2");
+//                         })
+//                 .attr("r", circleRadius)
+//                 .attr("class", "dragpoint")
+//                 .on("mousedown", function(d, i){clickCircle(i, this)})
+//                 //.on("mouseup", mouseup);
+//         svg.on("mouseup", mouseup);
                 
                 
-}
+// }
 
 var dirty=false;
 
@@ -515,11 +515,11 @@ var granularity = 2;
 
 
 
-function mousedown() {
-    var m = d3.mouse(this);
-        //console.log("moused down: ");
-    //svg.on("mousemove", mousemove);
-}
+// function mousedown() {
+//     var m = d3.mouse(this);
+//         //console.log("moused down: ");
+//     //svg.on("mousemove", mousemove);
+// }
 
 function getY(s){
         return s.split(',')[1].split(')')[0];
@@ -572,12 +572,31 @@ function mousemove() {
 	//find closest point
 	closestPointReturn = closestPoint(m);
 
-	console.log('wh. intersections[%d] set', currentCircle); // %%%
 	intersections[currentCircle] = {
 		x: closestPointReturn[0],
 		y: closestPointReturn[1]
 	};
 	isoplethIndices[currentCircle] = closestPointReturn[3];
+
+	var otherAxis;
+	for (var a = 0; a < numAxes; a++) {
+		if (a == fixed) continue;
+		if (a == currentCircle) continue;
+		otherAxis = a;
+		break;
+	}
+	var otherAxisPoints = data[otherAxis].points;
+	isoplethIndices[otherAxis] = validPoints[fixed][currentCircle][closestPointReturn[3]];
+	var otherPoint = otherAxisPoints[isoplethIndices[otherAxis]];
+	intersections[otherAxis] = {
+		x: xScale(otherPoint.x),
+		y: h - yScale(otherPoint.y)
+	};
+	d3.selectAll("polygon")
+		.filter(function (d, i){
+			return (i == otherAxis);
+		})
+		.attr("transform", handleTransformFromIndices(otherAxis, isoplethIndices[otherAxis]));
 
 	d3.selectAll("polygon")
 		.filter(function (d, i){
@@ -585,6 +604,11 @@ function mousemove() {
 		})
 		.attr("transform", handleTransformFromIndices(currentCircle, closestPointReturn[3]));
 
+	// TODO: need to choose two out of the three:
+	//    intersections[fixed]
+	//    intersections[currentCircle]
+	//    intersections[otherAxis]
+	// that result in the longets line
 	line.attr("x1", intersections[fixed].x);
 	line.attr("y1", intersections[fixed].y);
 	line.attr("x2", intersections[currentCircle].x);
@@ -706,8 +730,8 @@ function closestPoint(m){
                         var yScaled = h - yScale(destYRaw);
                         var isValid;
                         //ITERATING THE LEFT SIDE
-                        isValid = validPoints[fixed][dataIndex][i];
-	                isValid = true; // %%%
+                        isValid = validPoints[fixed][dataIndex][i] != null;
+	                // isValid = true; // %%%
                         if (isValid){
                                         var currentPointValue = point.u;
                                         closestPointValue = currentPointValue;
@@ -815,10 +839,10 @@ function constructValidPoints(){
 			//updateTempLineEquation(xScale(px), h - yScale(py), parseInt(line.attr("x2")), parseInt(line.attr("y2")));
 			updateTempLineEquation(xScale(px), h - yScale(py), intersections[fixedAxis].x, intersections[fixedAxis].y);
 			if (findIntersection(false, checkAxis)== undefined){
-				validPoints[fixedAxis][movingAxis][i]=false;
+				validPoints[fixedAxis][movingAxis][i]=null;
 			}
 			else {
-				validPoints[fixedAxis][movingAxis][i]=true;
+				validPoints[fixedAxis][movingAxis][i]=fakeIntersectionIndex;
 			}
 		}
 	}
