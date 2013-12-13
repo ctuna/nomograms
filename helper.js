@@ -210,6 +210,7 @@ function drawInputs(){
         //MAKE THE LABELS FOR CURRENT LINE VALS 
         updateLineEquation();
         //console.log("calling from drawinputs");
+		//HERE
         findIntersection(true, MIDDLE );
         var myClass = "axisControl";
         svg.selectAll("."+myClass).remove();
@@ -674,7 +675,12 @@ function closestTick(event){
                 currentTickIndex = i;
                 currentTick = ticks[i].getAttribute("transform");
                 currentY = getY(currentTick);
+			
                 currentDistance = Math.abs(currentY - m[1]);
+				//OPTIMIZATION
+				if (minDistance < .1  && currentDistance > minDistance){
+					break;
+				}
                 
                 //find closest tick to current y position
                 if (currentDistance < minDistance){
