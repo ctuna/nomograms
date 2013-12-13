@@ -1,4 +1,4 @@
-var w = 500;
+var w = 600;
 var h = 500;
 var domain =[[0, 5]];
 var numTicks=[10];
@@ -21,6 +21,7 @@ var MIDDLEKEYCODE = 50;
 var RIGHTKEYCODE = 51; 
 var xScale;
 var yScale;
+var labelPadding = 50;
 
 registerKeyboardHandler = function(callback) {
         console.log("registering handler");
@@ -120,7 +121,7 @@ function findIntersection(real, axis){
                         }
                 }
                 
-                if (minDistance >.1) {
+                if (minDistance >.5) {
                         intersection = undefined;
                 
                         return undefined;
@@ -222,7 +223,6 @@ function drawInputs(){
         //MAKE THE LABELS FOR CURRENT LINE VALS 
         updateLineEquation();
         //console.log("calling from drawinputs");
-        findIntersection(true, MIDDLE );
         var myClass = "axisControl";
         svg.selectAll("."+myClass).remove();
         svg.selectAll("."+myClass)
@@ -240,15 +240,17 @@ function drawInputs(){
 
                 //change alignment
                 .attr("x", function(d, i){
-                        if (i == 0){        return parseInt(line.attr("x1")) - polyWidth;}
-                        else if (i == 1 && intersection != undefined ){ return xScale(intersection.x)}
-                        else if (i == 2){ return parseInt(line.attr("x2")) + polyWidth;}
+	                return intersections[i].x;
+                        // if (i == 0){        return parseInt(line.attr("x1")) - polyWidth;}
+                        // else if (i == 1 && intersection != undefined ){ return xScale(intersection.x)}
+                        // else if (i == 2){ return parseInt(line.attr("x2")) + polyWidth;}
                         
                 })
                 .attr("y", function(d, i){
-                        if (i == 0){ return        parseInt(line.attr("y1")) - (polyHeight/2);}
-                        else if (i == 1 && intersection != undefined ){return h - yScale(intersection.y);}
-                        else { return parseInt(line.attr("y2")) -  (polyHeight/2);}
+	                return intersections[i].y;
+                        // if (i == 0){ return        parseInt(line.attr("y1")) - (polyHeight/2);}
+                        // else if (i == 1 && intersection != undefined ){return h - yScale(intersection.y);}
+                        // else { return parseInt(line.attr("y2")) -  (polyHeight/2);}
                 })
                         //X SHOULD BE THE CURRENT POINT ON THIS AXIS
 
@@ -453,13 +455,13 @@ function drawAxes(){
                 }
         
         var xRatio = (maxX - minX)/(w- 2*padding- 2*polyWidth);
-        h= (maxY-minY)/xRatio + 2*padding;
+	h= (maxY-minY)/xRatio + 2*padding+ labelPadding;
         xScale = d3.scale.linear()
                 .domain([minX, maxX])
                 .range([0+padding+polyWidth, w-padding-polyWidth]);
         yScale = d3.scale.linear()
                 .domain([minY, maxY])
-                .range([0+padding, h - padding]);
+                .range([0+padding, h- padding- labelPadding]);
         //console.log("h is initialized to: " + h);
         //now that we know width, make SVG
         svg = d3.select("body").append("svg")
@@ -634,6 +636,10 @@ function closestTick(event){
                 currentTick = ticks[i].getAttribute("transform");
                 currentY = getY(currentTick);
                 currentDistance = Math.abs(currentY - m[1]);
+	        //OPTIMIZATION
+	        if (minDistance < .1  && currentDistance > minDistance){
+		        break;
+	        }
                 
                 //find closest tick to current y position
                 if (currentDistance < minDistance){
