@@ -1,0 +1,148 @@
+\documentclass{proc}
+\bibliographystyle{ieeetr}
+
+\usepackage{listings}
+\usepackage{url}
+
+\lstset{
+  basicstyle=\sffamily,
+  columns=fullflexible,
+  tabsize=2,
+  frame=tb,
+  captionpos=b,
+}
+
+\lstdefinelanguage{httpjson}{
+  moredelim=[il][\bfseries]{~},
+  literate={-}{-}{1}
+}
+
+\title{title}
+
+\author{Claire Tuna \and Warren He}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+abstract
+\end{abstract}
+
+\section{Introduction}
+intro
+
+\section{Related Work}
+rw\cite{pynomo}
+
+\section{Methods}
+We discuss the implementations of the two parts of our system: the
+layout server and the renderer.
+
+\subsection{Layout Server}
+The layout server compiles a nomogram specification into an
+intermediate format that contains precomputed points along each axis.
+The server is a Flask~\cite{flask} application wrapped around a
+modified version of PyNomo.
+
+\subsubsection{Input}
+Inputs to the server are almost the same format as for PyNomo.
+PyNomo's specification format is a hierarchical arrangement of
+key-value dictionaries.
+An example is shown in Listing~\ref{lst:pynomospec}.
+\lstinputlisting[language=Python,label=lst:pynomospec,caption={A
+    PyNomo specification. This nomogram solves the equation
+    $z^2+pz+q=0$}]{pynomo-spec.py}
+Our server accepts a similar structure, but serialized as JSON.
+The same example is shown in Listing~\ref{lst:ourspec}.
+\lstinputlisting[language=httpjson,label=lst:ourspec,caption={An
+    example request to our layout server, with a nomogram
+    specification in JSON.}]{our-spec.json}
+
+PyNomo allows an author to enter an arbitrary function as a lambda
+function.
+Our server also allows authors to specify their own functions, but
+they must encode them as a JSON object with a \texttt{\_\_lambda\_\_} key
+and the function body (in Python) as a string.
+For security purposes, we place restrictions on what code we allow to
+run.
+Our server uses Python's parser to check the structure of the input
+first.
+Our lambda sanitization procedure only a few mathematically-useful
+types of nodes to exist in the parse tree.
+We also allow names to occur, but we restrict them to a small list of
+whitelisted functions from the standard \texttt{math} module.
+The sanitizer also identifies up to one unbound variable for use as
+the lambda's parameter name.
+If the the parse tree satisfies these restrictions, the server
+continues by finishing the compilation from this parse tree and
+substituting the resulting \texttt{function} object into the
+specification.
+
+One additional nuance in converting from JSON to Python is that JSON
+only supports one type of numeric data, while Python distinguishes
+between floating point numbers and integers.
+We parse all JSON numbers as floating point, so that PyNomo's internal
+division operations continue to produce fractional results as
+expected.
+
+Finally, the server adds a few unchanging directives to the
+specification: (1) a default paper size and (2) no output file.
+
+At this point, the server has prepared an object that is a valid
+PyNomo specification, with minimal formatting information.
+
+\subsubsection{Customized PyNomo}
+We run a modified version of PyNomo to compute a set of data for the
+renderer to use.
+A stock version of PyNomo lays out the nomogram's axes and renders
+them to a PDF file at a specified path.
+We have added additional code to PyNomo to expose the axis layout
+information, which PyNomo normally discards after rendering the PDF.
+
+We use the core \emph{logic} of PyNomo unmodified.
+PyNomo lays out the axes as parametric curve for each variable.
+This procedure for defining this curve based on the specification
+depends on the nomogram type.
+For each variable, PyNomo creates a function
+$\Re\rightarrow\Re^2$ which map the value of the variable to a
+coordinate.
+(A catch-all ``general determinant'' nomogram type allows the author
+to specify the parametric functions of these curves manually.)
+
+PyNomo draws a parametric curve as a piecewise-linear appproximation.
+It adaptively samples the curves' functions such that each line
+segment is approximately a certain fraction of the curve's approximate
+total length.
+It also draws tickmarks by computing the curves' position and
+derivative (finite difference numerical approximation) at round
+numbers.
+An author can configure PyNomo to prodcue up to five levels of tick
+marks on each axis.
+
+\subsubsection{Output}
+Our server extracts the curve samples and tickmark positions and
+orientation for each axis, in each nomogram.
+The server returns this information in a JSON-serialized form.
+Listing~\ref{lst:ourresponse} shows the structure of this response.
+\lstinputlisting[language=httpjson,label=lst:ourresponse,caption={The
+    structure of a response from our layout
+    server.}]{our-response.json}
+
+\subsection{Renderer}
+A JavaScript application uses the D3.js library~\cite{d3js} to render
+an interactive visualization based on the intermediate nomogram
+representation compiled by the layout server.
+
+\section{Results}
+r
+
+\section{Discussion}
+d
+
+\section{Future Work}
+fw
+
+\bibliography{refs}
+
+\end{document}

@@ -1,0 +1,33 @@
+~HTTP/1.1 200 OK
+Content-Type: application/json
+
+[ // array of axes
+	{ // the "q" axis
+		"name": "q", // taken from axis title
+		"points": [ // curve sample points, in order
+			{
+				"x": 0.0017450247054467739,
+				"y": 0.50941365980338127,
+				"u": -10.0 // the value the variable
+			},
+			... // around 1,000 more points
+		], // end of points
+		"ticks": [ // array of tick levels
+			[ // first level of ticks (coarsest)
+				{
+					"x": 0.0017450247054467739,
+					"y": 0.50941365980338127,
+					"u": -10.0,
+					// dx and dy are tangent to the curve
+					"dx": -0.00018390109698689981,
+					"dy": 0.99999998309019311
+				},
+				... // -9.0, -8.0, ...
+			], // end of first level of ticks
+			[ ... /* -9.5, -8.5, ... */ ],
+			[ ... /* -9.9, -9.8, -9.7, -9.6, -9.4, ... */ ],
+			... // up to two more levels
+		] // end of tick levels
+	}, // end of "q" axis
+	... // "p" and "z" axes
+]

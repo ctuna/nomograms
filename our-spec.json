@@ -1,0 +1,44 @@
+~POST /main HTTP/1.1
+Host: calm-atoll-2997.herokuapp.com
+Content-Type: application/json
+
+{
+  "block_params": [
+    {
+      "block_type": "type_10",
+      "width": 10,
+      "height": 10,
+      "f1_params": {
+        "u_min": -10,
+        "u_max": 10,
+        "function": {
+          "__lambda__": true,
+          "body": "u"
+        },
+        "title": "q"
+      },
+      "f2_params": {
+        "u_min": -10,
+        "u_max": 10,
+        "function": {
+          "__lambda__": true,
+          "body": "u"
+        },
+        "title": "p"
+      },
+      "f3_params": {
+        "u_min": 0,
+        "u_max": 12,
+        "function_3": {
+          "__lambda__": true,
+          "body": "u"
+        },
+        "function_4": {
+          "__lambda__": true,
+          "body": "u**2"
+        },
+        "title": "z"
+      }
+    }
+  ]
+}
