@@ -50,13 +50,13 @@ function updateEquationText(val){
               
                 
         else if (val === 'BMI'){	
-			document.getElementById('equation').innerHTML ='<a>BMI = pounds*4.88 / (feet)^2</a>';}
+			document.getElementById('equation').innerHTML ='<a>BMI = pounds / (inches)^2*703</a>';}
         else if (val == 'dubois'){
 			document.getElementById('equation').innerHTML ='<a>BSA = (71.84 x weight(kg)^.425 x height(cm)^.725)/10000</a>';}
 
         else {
                 //console.log("we went in bad place");
-                document.getElementById('equation').innerHTML ='<a>BMI = pounds*4.88 / (feet)^2</a>';}
+                document.getElementById('equation').innerHTML ='<a>BMI = pounds / (inches)^2*703</a>';}
         
 
 	  
